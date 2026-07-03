@@ -1,7 +1,23 @@
 #!/bin/bash
+
+function _docker_devtools_parse_bool() {
+    local name value
+    name=$1
+    value=${2,,}
+
+    case "$value" in
+        1|true|yes|on) return 0 ;;
+        ""|0|false|no|off) return 1 ;;
+        *)
+            echo "docker-devtools: invalid ${name} value '$2' (expected true or false)." >&2
+            return 2
+            ;;
+    esac
+}
+
 function docker_alias() {
-    local working_dir image
-    local -a docker_args
+    local working_dir image tty_mode
+    local -a docker_args extra_args
 
     if [ "$#" -lt 2 ]; then
         echo "docker-devtools: docker_alias requires a working directory and image." >&2
@@ -17,10 +33,48 @@ function docker_alias() {
     image=$2
     shift 2
 
-    docker_args=(
-        run -it --rm
+    tty_mode=${DOCKER_DEVTOOLS_TTY:-always}
+
+    docker_args=(run)
+
+    case "$tty_mode" in
+        always)
+            docker_args+=(-it)
+            ;;
+        auto)
+            if [ -t 0 ] && [ -t 1 ]; then
+                docker_args+=(-it)
+            fi
+            ;;
+        never)
+            ;;
+        *)
+            echo "docker-devtools: invalid DOCKER_DEVTOOLS_TTY value '$tty_mode' (expected always, auto, or never)." >&2
+            return 2
+            ;;
+    esac
+
+    docker_args+=(
+        --rm
         -v "$PWD:$working_dir"
         -w "$working_dir"
+    )
+
+    if _docker_devtools_parse_bool DOCKER_DEVTOOLS_MAP_HOST_USER "${DOCKER_DEVTOOLS_MAP_HOST_USER:-}"; then
+        docker_args+=(--user "$(id -u):$(id -g)")
+    else
+        case $? in
+            1) ;;
+            2) return 2 ;;
+        esac
+    fi
+
+    if [ -n "${DOCKER_DEVTOOLS_EXTRA_ARGS:-}" ]; then
+        read -r -a extra_args <<< "${DOCKER_DEVTOOLS_EXTRA_ARGS}"
+        docker_args+=("${extra_args[@]}")
+    fi
+
+    docker_args+=(
         "$image"
         "$@"
     )
