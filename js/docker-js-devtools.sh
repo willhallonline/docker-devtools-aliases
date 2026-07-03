@@ -5,9 +5,11 @@ alias stylelint-docker="docker_alias /app willhallonline/stylelint:alpine"
 alias eslint-standard="docker_alias /app willhallonline/eslint-standard:alpine"
 alias eslint-airbnb="docker_alias /app willhallonline/eslint-airbnb:alpine"
 
-# JavaScript / CoffeeScript
+# Node.js
 alias node-docker="docker_alias /app node:alpine node"
 alias npm-docker="docker_alias /app node:alpine npm"
 alias yarn-docker="docker_alias /app node:alpine yarn"
 alias node-bash-docker="docker_alias /app node /bin/bash"
+
+# CoffeeScript
 alias coffee-docker="docker_alias /app shouldbee/coffeescript coffee"
