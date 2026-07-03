@@ -31,6 +31,27 @@ assert_contains() {
     fi
 }
 
+assert_not_contains() {
+    local desc="$1" needle="$2" haystack="$3"
+    if [[ "$haystack" != *"$needle"* ]]; then
+        _pass "$desc"
+    else
+        _fail "$desc" "did not expect to contain '$needle' in: $haystack"
+    fi
+}
+
+assert_line_eq() {
+    local desc="$1" line_no="$2" expected="$3" actual="$4"
+    local actual_line
+    actual_line="$(sed -n "${line_no}p" <<< "$actual")"
+
+    if [[ "$actual_line" == "$expected" ]]; then
+        _pass "$desc"
+    else
+        _fail "$desc" "expected line ${line_no} to be $(printf '%q' "$expected"), got $(printf '%q' "$actual_line")"
+    fi
+}
+
 assert_exit() {
     local desc="$1" expected_code="$2" actual_code="$3"
     if [[ "$actual_code" == "$expected_code" ]]; then
@@ -91,13 +112,15 @@ assert_exit "too-few-args: exit code 2" 2 "$rc"
 # 2. Basic argv construction (working_dir, image, passthrough cmd)
 (cd /tmp && docker_alias /app myimage:tag mycommand --flag value)
 argv=$(_read_stub)
-assert_contains "basic: run sub-command" "run" "$argv"
-assert_contains "basic: --rm flag" "--rm" "$argv"
+assert_line_eq "basic: run sub-command" 1 "run" "$argv"
+assert_line_eq "basic: tty flag" 2 "-it" "$argv"
+assert_line_eq "basic: --rm flag" 3 "--rm" "$argv"
 assert_contains "basic: volume mount contains working_dir" "/app" "$argv"
 assert_contains "basic: image present" "myimage:tag" "$argv"
 assert_contains "basic: passthrough cmd" "mycommand" "$argv"
 assert_contains "basic: passthrough flag" "--flag" "$argv"
 assert_contains "basic: passthrough value" "value" "$argv"
+assert_not_contains "basic: host user mapping disabled by default" "--user" "$argv"
 
 # 3. Working directory is passed as -w argument
 echo ""
@@ -167,6 +190,76 @@ rc=0
     docker_alias /app myimage >/dev/null 2>&1
 ) || rc=$?
 assert_exit "no-docker: exit code 127" 127 "$rc"
+
+# 9. DOCKER_DEVTOOLS_EXTRA_ARGS are inserted before the image
+echo ""
+echo "docker_alias: DOCKER_DEVTOOLS_EXTRA_ARGS"
+(
+    export DOCKER_DEVTOOLS_EXTRA_ARGS="--network host --pull always"
+    cd /tmp && docker_alias /app myimage:tag
+)
+argv=$(_read_stub)
+assert_contains "extra-args: network flag present" "--network" "$argv"
+assert_contains "extra-args: network value present" "host" "$argv"
+assert_contains "extra-args: pull flag present" "--pull" "$argv"
+assert_contains "extra-args: pull value present" "always" "$argv"
+assert_line_eq "extra-args: inserted before image" 12 "myimage:tag" "$argv"
+
+# 10. DOCKER_DEVTOOLS_MAP_HOST_USER adds --user uid:gid
+echo ""
+echo "docker_alias: DOCKER_DEVTOOLS_MAP_HOST_USER"
+(
+    export DOCKER_DEVTOOLS_MAP_HOST_USER=true
+    cd /tmp && docker_alias /app myimage:tag
+)
+argv=$(_read_stub)
+assert_contains "map-host-user: user flag present" "--user" "$argv"
+assert_contains "map-host-user: uid gid present" "$(id -u):$(id -g)" "$argv"
+
+# 11. DOCKER_DEVTOOLS_TTY=never disables -it
+echo ""
+echo "docker_alias: DOCKER_DEVTOOLS_TTY=never"
+(
+    export DOCKER_DEVTOOLS_TTY=never
+    cd /tmp && docker_alias /app myimage:tag
+)
+argv=$(_read_stub)
+assert_not_contains "tty-never: tty flag absent" "-it" "$argv"
+assert_line_eq "tty-never: --rm becomes second line" 2 "--rm" "$argv"
+
+# 12. DOCKER_DEVTOOLS_TTY=auto omits -it when stdio is not a tty
+echo ""
+echo "docker_alias: DOCKER_DEVTOOLS_TTY=auto"
+output=$(
+    export DOCKER_DEVTOOLS_TTY=auto
+    cd /tmp && docker_alias /app myimage:tag </dev/null >/dev/null
+    _read_stub
+)
+assert_not_contains "tty-auto: tty flag absent without tty" "-it" "$output"
+assert_line_eq "tty-auto: --rm becomes second line" 2 "--rm" "$output"
+
+# 13. Invalid runtime config values fail loudly
+echo ""
+echo "docker_alias: invalid runtime config"
+output=$(
+    export DOCKER_DEVTOOLS_TTY=invalid
+    docker_alias /app myimage:tag 2>&1
+) || true
+assert_contains "invalid-tty: stderr message" "invalid DOCKER_DEVTOOLS_TTY value" "$output"
+
+rc=0
+output=$(
+    export DOCKER_DEVTOOLS_MAP_HOST_USER=maybe
+    docker_alias /app myimage:tag 2>&1
+) || true
+assert_contains "invalid-bool: stderr message" "invalid DOCKER_DEVTOOLS_MAP_HOST_USER value" "$output"
+
+rc=0
+(
+    export DOCKER_DEVTOOLS_MAP_HOST_USER=maybe
+    docker_alias /app myimage:tag >/dev/null 2>&1
+) || rc=$?
+assert_exit "invalid-bool: exit code 2" 2 "$rc"
 
 # ── summary ───────────────────────────────────────────────────────────────────
 echo ""
