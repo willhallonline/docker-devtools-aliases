@@ -81,7 +81,7 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 
 ### Images
 
-The `images/docker-image-devtools.sh` file contains image-optimisation aliases (e.g. `jpegtran-docker`). This file is **not** sourced automatically — add it explicitly if you need it:
+The `images/docker-image-devtools.sh` file contains image-conversion, resizing, and optimisation aliases. This file is **not** sourced automatically — add it explicitly if you need it:
 
 ```bash
 source ~/.docker-devtools/docker-devtools.sh
@@ -93,6 +93,30 @@ In PowerShell:
 ```powershell
 . "$HOME/.docker-devtools/docker-devtools.ps1"
 . "$HOME/.docker-devtools/images/docker-image-devtools.ps1"
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `jpegtran-docker` | JPEG lossless transformation (mozjpeg) | `datawraith/mozjpeg` |
+| `magick-docker` / `convert-docker` | ImageMagick — conversion & resizing | `dpokidov/imagemagick:latest` |
+| `mogrify-docker` | ImageMagick — in-place batch conversion/resize | `dpokidov/imagemagick:latest` |
+| `identify-docker` | ImageMagick — image metadata/info | `dpokidov/imagemagick:latest` |
+| `vipsthumbnail-docker` | libvips — fast, low-memory thumbnailing/resizing | `marcbachmann/libvips:latest` |
+| `cwebp-docker` / `dwebp-docker` | WebP encode/decode | `takecy/webp:latest` |
+
+```bash
+# Resize an image with ImageMagick
+magick-docker input.jpg -resize 50% output.jpg
+
+# Batch-resize and reformat in place
+mogrify-docker -resize 800x600 -format png *.jpg
+
+# Generate a fast thumbnail with libvips
+vipsthumbnail-docker input.jpg --size 200x200 -o thumb.jpg
+
+# Convert to/from WebP
+cwebp-docker input.png -o output.webp
+dwebp-docker output.webp -o roundtrip.png
 ```
 
 ### AI tools
@@ -125,6 +149,7 @@ openwiki-docker --init
 
 # Let Aider edit a file with AI assistance
 DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker some_file.py
+```
 ```
 
 ## Usage examples
@@ -199,6 +224,14 @@ export DOCKER_DEVTOOLS_TTY=auto
 export DOCKER_DEVTOOLS_MAP_HOST_USER=true
 ```
 
+### `--entrypoint <name>` (alias definitions)
+
+Some multi-tool images (e.g. ImageMagick, libvips, WebP) bake in a default entrypoint that doesn't match every binary the image ships. Alias authors can override it by passing `--entrypoint <name>` immediately after the image in a `docker_alias` call:
+
+```bash
+alias mogrify-docker="docker_alias /imgs dpokidov/imagemagick:latest --entrypoint mogrify"
+```
+
 ## Updating
 
 ```bash
@@ -214,7 +247,7 @@ A shell-based test harness is included. It stubs out Docker and the alias sub-fi
 bash tests/run_tests.sh
 ```
 
-Requires bash 4+. All 36 assertions cover argument validation, TTY mode, host-user mapping, extra args, and error handling.
+Requires bash 4+. All 42 assertions cover argument validation, TTY mode, host-user mapping, extra args, entrypoint overrides, and error handling.
 
 A matching PowerShell test harness (`tests/run_tests.ps1`) covers the same scenarios for the `.ps1` scripts:
 
