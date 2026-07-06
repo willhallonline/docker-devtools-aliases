@@ -8,6 +8,7 @@ Docker DevTools provides a set of shell aliases that run common developer tools 
 |-------------|-------|
 | **Docker** | Must be installed and in `PATH`. [Get Docker](https://docs.docker.com/get-docker/) |
 | **Bash 4+** or **zsh** | The wrapper uses bash arrays; macOS ships bash 3 — upgrade via Homebrew (`brew install bash`) or use zsh |
+| **PowerShell 5.1+** or **PowerShell 7+** | Only needed if you use the `.ps1` scripts instead of the bash version (Windows, or cross-platform `pwsh`) |
 | **git** | Recommended for installation and updates |
 
 ## Installation
@@ -20,7 +21,7 @@ git clone https://github.com/willhallonline/docker-devtools-aliases.git ~/.docke
 
 Cloning lets you pull future updates with a simple `git pull`.
 
-### Source in your shell profile
+### Bash / zsh
 
 Add the following line to your `~/.bashrc` or `~/.zshrc`:
 
@@ -33,6 +34,22 @@ Then reload your shell:
 ```bash
 source ~/.bashrc   # or: source ~/.zshrc
 ```
+
+### PowerShell
+
+Clone to a location of your choice (e.g. `~/.docker-devtools` also works on Windows/PowerShell), then add the following line to your PowerShell profile (`$PROFILE`):
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+```
+
+Reload your profile, or open a new session:
+
+```powershell
+. $PROFILE
+```
+
+The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php/docker-php-devtools.ps1`, `images/docker-image-devtools.ps1`) mirror the bash versions tool-for-tool and work on Windows PowerShell 5.1+ and cross-platform PowerShell 7+ (`pwsh` on Linux/macOS). Bash `alias`es become PowerShell functions of the same name (e.g. `node-docker`, `phpcs-drupal`), since PowerShell aliases can't carry baked-in arguments.
 
 ## Available tools
 
@@ -69,6 +86,13 @@ The `images/docker-image-devtools.sh` file contains image-optimisation aliases (
 ```bash
 source ~/.docker-devtools/docker-devtools.sh
 source ~/.docker-devtools/images/docker-image-devtools.sh
+```
+
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/images/docker-image-devtools.ps1"
 ```
 
 ### AI tools
@@ -191,6 +215,12 @@ bash tests/run_tests.sh
 ```
 
 Requires bash 4+. All 36 assertions cover argument validation, TTY mode, host-user mapping, extra args, and error handling.
+
+A matching PowerShell test harness (`tests/run_tests.ps1`) covers the same scenarios for the `.ps1` scripts:
+
+```powershell
+pwsh tests/run_tests.ps1
+```
 
 ## Troubleshooting
 
