@@ -40,14 +40,13 @@ source ~/.bashrc   # or: source ~/.zshrc
 
 | Alias | Tool | Image |
 |-------|------|-------|
-| `stylelint-docker` | Stylelint CSS linter | `willhallonline/stylelint:alpine` |
-| `eslint-standard` | ESLint (Standard config) | `willhallonline/eslint-standard:alpine` |
-| `eslint-airbnb` | ESLint (Airbnb config) | `willhallonline/eslint-airbnb:alpine` |
-| `node-docker` | Node.js REPL / scripts | `node:alpine` |
-| `npm-docker` | npm | `node:alpine` |
-| `yarn-docker` | Yarn | `node:alpine` |
-| `node-bash-docker` | Interactive bash in Node container | `node` |
-| `coffee-docker` | CoffeeScript compiler | `shouldbee/coffeescript` |
+| `stylelint-docker` | Stylelint CSS linter (community image) | `solutiondrive/stylelint:latest` |
+| `eslint-docker` | ESLint (community image) | `pipelinecomponents/eslint:latest` |
+| `node-docker` | Node.js REPL / scripts | `node:22-alpine` |
+| `npm-docker` | npm | `node:22-alpine` |
+| `yarn-docker` | Yarn | `node:22-alpine` |
+| `pnpm-docker` | pnpm | `node:22-alpine` |
+| `node-bash-docker` | Interactive bash in Node container | `node:22-alpine` |
 
 ### PHP
 
@@ -81,7 +80,7 @@ All aliases mount the **current working directory** into the container and run t
 stylelint-docker bad.css
 
 # Lint all JS files in the current directory
-eslint-standard .
+eslint-docker .
 
 # Run Composer install
 composer-docker install
