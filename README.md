@@ -72,6 +72,38 @@ source ~/.docker-devtools/docker-devtools.sh
 source ~/.docker-devtools/images/docker-image-devtools.sh
 ```
 
+### AI tools
+
+The `ai/docker-ai-devtools.sh` file contains aliases for AI-powered CLI tools. This file is **not** sourced automatically — add it explicitly if you need it:
+
+```bash
+source ~/.docker-devtools/docker-devtools.sh
+source ~/.docker-devtools/ai/docker-ai-devtools.sh
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `markitdown-docker` | [MarkItDown](https://github.com/microsoft/markitdown) — converts PDFs, Office docs, images, audio, HTML, etc. to Markdown for LLMs | `python:3.13-slim` (installs `markitdown` at runtime) |
+| `llm-docker` | [llm](https://llm.datasette.io) — Simon Willison's CLI for prompting/piping data through LLMs | `python:3.13-slim` (installs `llm` at runtime) |
+| `openwiki-docker` | [OpenWiki](https://github.com/langchain-ai/openwiki) — generates and maintains agent-readable docs for a codebase | `node:22-alpine` (via `npx`) |
+| `aider-docker` | [Aider](https://aider.chat) — AI pair-programming CLI that edits files and commits changes in your repo | `paulgauthier/aider-full` |
+
+> **Note:** `markitdown-docker` and `llm-docker` have no official pre-built image, so they `pip install` the package into a fresh `python:3.13-slim` container on every run (a few extra seconds per invocation). Most of these tools call an LLM provider and need an API key — pass it through with `DOCKER_DEVTOOLS_EXTRA_ARGS`, e.g. `DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker`.
+
+```bash
+# Convert a PDF to Markdown
+markitdown-docker report.pdf > report.md
+
+# Ask an LLM about piped input
+cat notes.txt | llm-docker "Summarize this"
+
+# Generate docs for the current repo
+openwiki-docker --init
+
+# Let Aider edit a file with AI assistance
+DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker some_file.py
+```
+
 ## Usage examples
 
 All aliases mount the **current working directory** into the container and run the tool there. Arguments after the alias are forwarded directly to the tool.
