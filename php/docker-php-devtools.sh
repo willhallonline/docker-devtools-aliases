@@ -1,21 +1,28 @@
-# Composer
-alias composer-docker="docker_alias /app willhallonline/composer:alpine composer"
+# PHP Package Management
+#
+# Composer (official image, PHP 8.4-alpine LTS)
+alias composer-docker="docker_alias /app composer:latest composer"
+alias php-docker="docker_alias /app php:8.4-alpine php"
 
-# PHP CodeSniffer — local binaries (Drupal Coder)
+# PHP CodeSniffer
+#
+# Local binaries (Drupal Coder)
+# Caveat: requires ~/.composer/vendor/bin/phpcs from local Composer install
 alias phpcs-d='~/.composer/vendor/bin/phpcs --standard=~/.composer/vendor/drupal/coder/coder_sniffer/Drupal --extensions=php,inc,install,module,theme'
 alias phpcbf-d='~/.composer/vendor/bin/phpcbf --standard=~/.composer/vendor/drupal/coder/coder_sniffer/Drupal --extensions=php,inc,install,module,theme'
 
-# PHP CodeSniffer — Docker images
-# Registers a phpcs/phpcbf alias pair: _phpcs_pair <name> <image> [extra-args]
+# Docker images (community-maintained texthtml/phpcs with PHP CodeSniffer 4.0.1)
+# Register phpcs/phpcbf alias pairs: _phpcs_pair <name> [extra-args]
 _phpcs_pair() {
-    local name="$1" image="$2" extra="${3-}"
-    alias "phpcs-${name}"="docker_alias /app ${image} phpcs${extra:+ ${extra}}"
-    alias "phpcbf-${name}"="docker_alias /app ${image} phpcbf${extra:+ ${extra}}"
+    local name="$1" extra="${2-}"
+    alias "phpcs-${name}"="docker_alias /app texthtml/phpcs:latest phpcs${extra:+ ${extra}}"
+    alias "phpcbf-${name}"="docker_alias /app texthtml/phpcs:latest phpcbf${extra:+ ${extra}}"
 }
 
-_phpcs_pair cakephp   willhallonline/cakephp-phpcs:alpine
-_phpcs_pair wordpress willhallonline/wordpress-phpcs:alpine
-_phpcs_pair drupal    willhallonline/drupal-phpcs:alpine    "--extensions=php,inc,install,module,theme"
-_phpcs_pair yii       willhallonline/yii-phpcs:alpine
-_phpcs_pair laravel   willhallonline/laravel-phpcs:alpine
-_phpcs_pair docker    willhallonline/phpcs:alpine
+# Framework-specific PHPCS aliases (configure standards via .phpcs.xml in project root)
+_phpcs_pair cakephp
+_phpcs_pair wordpress
+_phpcs_pair drupal    "--extensions=php,inc,install,module,theme"
+_phpcs_pair yii
+_phpcs_pair laravel
+_phpcs_pair generic   # Generic PSR-12 / custom standards
