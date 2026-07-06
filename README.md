@@ -63,6 +63,20 @@ source ~/.bashrc   # or: source ~/.zshrc
 
 > **Note:** `phpcs-d` and `phpcbf-d` (Drupal, local) are thin wrappers around `~/.composer/vendor/bin/phpcs` and require a local Composer-installed copy of `drupal/coder`. They do **not** use Docker.
 
+### Python
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `python-docker` | Python REPL / scripts | `python:alpine` |
+| `pip-docker` | pip package manager | `python:alpine` |
+| `python-bash-docker` | Interactive shell in Python container | `python:alpine` |
+| `black-docker` | Black code formatter | `pyfound/black:latest_release` |
+| `flake8-docker` | Flake8 style/lint checker (PEP 8) | `alpine/flake8:latest` |
+| `pylint-docker` | Pylint static analysis | `cytopia/pylint:latest` |
+| `mypy-docker` | Mypy static type checker | `cytopia/mypy:latest` |
+| `bandit-docker` | Bandit security linter | `cytopia/bandit:latest` |
+
+
 ### Images
 
 The `images/docker-image-devtools.sh` file contains image-optimisation aliases (e.g. `jpegtran-docker`). This file is **not** sourced automatically — add it explicitly if you need it:
