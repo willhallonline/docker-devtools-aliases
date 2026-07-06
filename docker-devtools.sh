@@ -16,7 +16,7 @@ function _docker_devtools_parse_bool() {
 }
 
 function docker_alias() {
-    local working_dir image tty_mode
+    local working_dir image tty_mode entrypoint
     local -a docker_args extra_args
 
     if [ "$#" -lt 2 ]; then
@@ -32,6 +32,18 @@ function docker_alias() {
     working_dir=$1
     image=$2
     shift 2
+
+    # Optional --entrypoint <name> immediately after the image, used to
+    # override a container's baked-in entrypoint (e.g. selecting a specific
+    # binary out of a multi-tool image).
+    if [ "${1-}" = "--entrypoint" ]; then
+        if [ -z "${2-}" ]; then
+            echo "docker-devtools: --entrypoint requires a value." >&2
+            return 2
+        fi
+        entrypoint=$2
+        shift 2
+    fi
 
     tty_mode=${DOCKER_DEVTOOLS_TTY:-always}
 
@@ -59,6 +71,10 @@ function docker_alias() {
         -v "$PWD:$working_dir"
         -w "$working_dir"
     )
+
+    if [ -n "${entrypoint-}" ]; then
+        docker_args+=(--entrypoint "$entrypoint")
+    fi
 
     if _docker_devtools_parse_bool DOCKER_DEVTOOLS_MAP_HOST_USER "${DOCKER_DEVTOOLS_MAP_HOST_USER:-}"; then
         docker_args+=(--user "$(id -u):$(id -g)")

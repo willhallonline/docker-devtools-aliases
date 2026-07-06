@@ -261,6 +261,25 @@ rc=0
 ) || rc=$?
 assert_exit "invalid-bool: exit code 2" 2 "$rc"
 
+# 14. --entrypoint overrides the container's baked-in entrypoint
+echo ""
+echo "docker_alias: --entrypoint override"
+(cd /tmp && docker_alias /app myimage:tag --entrypoint mogrify input.jpg -resize 50%)
+argv=$(_read_stub)
+assert_contains "entrypoint: flag present" "--entrypoint" "$argv"
+assert_contains "entrypoint: value present" "mogrify" "$argv"
+assert_contains "entrypoint: passthrough args preserved" "input.jpg" "$argv"
+assert_contains "entrypoint: passthrough flag preserved" "-resize" "$argv"
+
+# 15. --entrypoint requires a value
+echo ""
+echo "docker_alias: --entrypoint missing value"
+output=$(docker_alias /app myimage:tag --entrypoint 2>&1) || true
+assert_contains "entrypoint-missing: stderr message" "--entrypoint requires a value" "$output"
+
+rc=0; docker_alias /app myimage:tag --entrypoint >/dev/null 2>&1 || rc=$?
+assert_exit "entrypoint-missing: exit code 2" 2 "$rc"
+
 # ── summary ───────────────────────────────────────────────────────────────────
 echo ""
 echo "Results: ${PASS} passed, ${FAIL} failed"
