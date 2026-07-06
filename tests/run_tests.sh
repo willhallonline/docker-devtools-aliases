@@ -93,6 +93,7 @@ trap 'rm -rf "$_TMP_DIR" "$STUB_LOG"' EXIT
 cp "$REPO_ROOT/docker-devtools.sh" "$_TMP_DIR/"
 _stub_alias_file "$_TMP_DIR/php/docker-php-devtools.sh"
 _stub_alias_file "$_TMP_DIR/js/docker-js-devtools.sh"
+_stub_alias_file "$_TMP_DIR/python/docker-python-devtools.sh"
 
 # shellcheck source=/dev/null
 source "$_TMP_DIR/docker-devtools.sh"

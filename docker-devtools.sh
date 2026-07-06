@@ -112,5 +112,6 @@ function _docker_devtools_source() {
 
 _docker_devtools_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-_docker_devtools_source "$_docker_devtools_dir/php/docker-php-devtools.sh" || return 1 2>/dev/null || exit 1
-_docker_devtools_source "$_docker_devtools_dir/js/docker-js-devtools.sh"   || return 1 2>/dev/null || exit 1
+_docker_devtools_source "$_docker_devtools_dir/php/docker-php-devtools.sh"       || return 1 2>/dev/null || exit 1
+_docker_devtools_source "$_docker_devtools_dir/js/docker-js-devtools.sh"         || return 1 2>/dev/null || exit 1
+_docker_devtools_source "$_docker_devtools_dir/python/docker-python-devtools.sh" || return 1 2>/dev/null || exit 1
