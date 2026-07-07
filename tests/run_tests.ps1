@@ -53,9 +53,11 @@ $TmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.Guid]::NewGuid())
 New-Item -ItemType Directory -Path $TmpDir | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $TmpDir 'php') | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $TmpDir 'js') | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $TmpDir 'python') | Out-Null
 Copy-Item (Join-Path $RepoRoot 'docker-devtools.ps1') $TmpDir
 New-Item -ItemType File -Path (Join-Path $TmpDir 'php/docker-php-devtools.ps1') | Out-Null
 New-Item -ItemType File -Path (Join-Path $TmpDir 'js/docker-js-devtools.ps1') | Out-Null
+New-Item -ItemType File -Path (Join-Path $TmpDir 'python/docker-python-devtools.ps1') | Out-Null
 
 try {
     . (Join-Path $TmpDir 'docker-devtools.ps1')
@@ -65,8 +67,8 @@ try {
     Write-Host ''
     Write-Host 'Invoke-DockerAlias: argument validation'
 
-    $errOutput = $(Invoke-DockerAlias -WorkingDir '' -Image '' -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1)
-    assert-contains 'too-few-args: stderr message' 'requires a working directory' ($errVar -join ' ')
+    $errOutput = & { $ErrorActionPreference = 'Continue'; Invoke-DockerAlias -WorkingDir '' -Image '' 2>&1 }
+    assert-contains 'too-few-args: stderr message' 'requires a working directory' ($errOutput -join ' ')
 
     Write-Host ''
     Write-Host 'Invoke-DockerAlias: basic argv construction'
@@ -150,14 +152,39 @@ try {
     Write-Host ''
     Write-Host 'Invoke-DockerAlias: invalid runtime config'
     $env:DOCKER_DEVTOOLS_TTY = 'invalid'
-    $errOutput = Invoke-DockerAlias /app myimage:tag -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1
+    $errOutput = & { $ErrorActionPreference = 'Continue'; Push-Location $TmpDir; Invoke-DockerAlias /app myimage:tag 2>&1; Pop-Location }
     Remove-Item Env:\DOCKER_DEVTOOLS_TTY
-    assert-contains 'invalid-tty: stderr message' 'invalid DOCKER_DEVTOOLS_TTY value' ($errVar -join ' ')
+    assert-contains 'invalid-tty: stderr message' 'invalid DOCKER_DEVTOOLS_TTY value' ($errOutput -join ' ')
 
     $env:DOCKER_DEVTOOLS_MAP_HOST_USER = 'maybe'
-    $errOutput = Invoke-DockerAlias /app myimage:tag -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1
+    $errOutput = & { $ErrorActionPreference = 'Continue'; Push-Location $TmpDir; Invoke-DockerAlias /app myimage:tag 2>&1; Pop-Location }
     Remove-Item Env:\DOCKER_DEVTOOLS_MAP_HOST_USER
-    assert-contains 'invalid-bool: stderr message' 'invalid DOCKER_DEVTOOLS_MAP_HOST_USER value' ($errVar -join ' ')
+    assert-contains 'invalid-bool: stderr message' 'invalid DOCKER_DEVTOOLS_MAP_HOST_USER value' ($errOutput -join ' ')
+
+    Write-Host ''
+    Write-Host 'Invoke-DockerAlias: --entrypoint override'
+    Push-Location $TmpDir
+    Invoke-DockerAlias /app myimage:tag --entrypoint mogrify input.jpg -resize 50%
+    Pop-Location
+    $argv = _read-stub
+    assert-contains 'entrypoint: flag present' '--entrypoint' ($argv -join ' ')
+    assert-contains 'entrypoint: value present' 'mogrify' ($argv -join ' ')
+    assert-contains 'entrypoint: passthrough args preserved' 'input.jpg' ($argv -join ' ')
+    assert-contains 'entrypoint: passthrough flag preserved' '-resize' ($argv -join ' ')
+
+    Write-Host ''
+    Write-Host 'Invoke-DockerAlias: --entrypoint missing value'
+    $errOutput = & { $ErrorActionPreference = 'Continue'; Invoke-DockerAlias /app myimage:tag --entrypoint 2>&1 }
+    assert-contains 'entrypoint-missing: stderr message' '--entrypoint requires a value' ($errOutput -join ' ')
+
+    Write-Host ''
+    Write-Host 'Invoke-DockerAlias: short-flag passthrough (e.g. -o)'
+    Push-Location $TmpDir
+    Invoke-DockerAlias /app myimage:tag -o output.file input.file
+    Pop-Location
+    $argv = _read-stub
+    assert-contains 'short-flag: -o preserved' '-o' ($argv -join ' ')
+    assert-contains 'short-flag: value preserved' 'output.file' ($argv -join ' ')
 }
 finally {
     Remove-Item -Recurse -Force $TmpDir -ErrorAction SilentlyContinue

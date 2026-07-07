@@ -38,9 +38,8 @@ function Invoke-DockerAlias {
         and forwards any remaining arguments to the containerized process.
     #>
     param(
-        [Parameter(Position = 0)] [string] $WorkingDir,
-        [Parameter(Position = 1)] [string] $Image,
-        [Parameter(ValueFromRemainingArguments = $true)] [string[]] $Rest
+        [string] $WorkingDir,
+        [string] $Image
     )
 
     if (-not $WorkingDir -or -not $Image) {
@@ -51,6 +50,28 @@ function Invoke-DockerAlias {
     if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
         Write-Error 'docker-devtools: docker is not installed or not in PATH.'
         return
+    }
+
+    # Everything after -WorkingDir/-Image is forwarded verbatim to the
+    # container. Deliberately NOT using [Parameter(ValueFromRemainingArguments)]
+    # here (which would make this an "advanced" function): advanced functions
+    # try to bind short passthrough flags like -o or -d against PowerShell's
+    # common parameters (-OutVariable, -Debug, ...) and fail with an
+    # "ambiguous parameter" error. Keeping this a simple function and reading
+    # $args directly avoids that.
+    $Rest = [string[]]$args
+
+    # Optional --entrypoint <name> immediately after the image, used to
+    # override a container's baked-in entrypoint (e.g. selecting a specific
+    # binary out of a multi-tool image).
+    $entrypoint = $null
+    if ($Rest -and $Rest.Count -gt 0 -and $Rest[0] -eq '--entrypoint') {
+        if ($Rest.Count -lt 2 -or [string]::IsNullOrEmpty($Rest[1])) {
+            Write-Error 'docker-devtools: --entrypoint requires a value.'
+            return
+        }
+        $entrypoint = $Rest[1]
+        $Rest = if ($Rest.Count -gt 2) { $Rest[2..($Rest.Count - 1)] } else { @() }
     }
 
     $ttyMode = if ($env:DOCKER_DEVTOOLS_TTY) { $env:DOCKER_DEVTOOLS_TTY } else { 'always' }
@@ -78,6 +99,11 @@ function Invoke-DockerAlias {
     $dockerArgs.Add('-w')
     $dockerArgs.Add($WorkingDir)
 
+    if ($entrypoint) {
+        $dockerArgs.Add('--entrypoint')
+        $dockerArgs.Add($entrypoint)
+    }
+
     $mapHostUser = Test-DockerDevToolsBool -Name 'DOCKER_DEVTOOLS_MAP_HOST_USER' -Value $env:DOCKER_DEVTOOLS_MAP_HOST_USER
     if ($null -eq $mapHostUser) { return }
     if ($mapHostUser -and -not $IsWindows) {
@@ -102,7 +128,7 @@ $script:DockerDevToolsDir = $PSScriptRoot
 
 # NOTE: dot-sourcing must happen directly in this script's scope (not inside a
 # function) so the functions/aliases they define land in the caller's scope.
-foreach ($relativePath in @('php/docker-php-devtools.ps1', 'js/docker-js-devtools.ps1')) {
+foreach ($relativePath in @('php/docker-php-devtools.ps1', 'js/docker-js-devtools.ps1', 'python/docker-python-devtools.ps1')) {
     $alias_file = Join-Path $script:DockerDevToolsDir $relativePath
 
     if (-not (Test-Path -LiteralPath $alias_file)) {
