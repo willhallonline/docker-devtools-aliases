@@ -69,15 +69,18 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 
 | Alias | Tool | Image |
 |-------|------|-------|
-| `composer-docker` | Composer package manager | `willhallonline/composer:alpine` |
-| `phpcs-docker` / `phpcbf-docker` | PHP_CodeSniffer (generic) | `willhallonline/phpcs:alpine` |
-| `phpcs-drupal` / `phpcbf-drupal` | PHP_CodeSniffer (Drupal standard) | `willhallonline/drupal-phpcs:alpine` |
-| `phpcs-wordpress` / `phpcbf-wordpress` | PHP_CodeSniffer (WordPress standard) | `willhallonline/wordpress-phpcs:alpine` |
-| `phpcs-cakephp` / `phpcbf-cakephp` | PHP_CodeSniffer (CakePHP standard) | `willhallonline/cakephp-phpcs:alpine` |
-| `phpcs-yii` / `phpcbf-yii` | PHP_CodeSniffer (Yii standard) | `willhallonline/yii-phpcs:alpine` |
-| `phpcs-laravel` / `phpcbf-laravel` | PHP_CodeSniffer (Laravel standard) | `willhallonline/laravel-phpcs:alpine` |
+| `composer-docker` | Composer package manager (official image) | `composer:latest` |
+| `php-docker` | PHP CLI / scripts | `php:8.4-alpine` |
+| `phpcs-generic` / `phpcbf-generic` | PHP_CodeSniffer (generic, community image) | `texthtml/phpcs:latest` |
+| `phpcs-drupal` / `phpcbf-drupal` | PHP_CodeSniffer (Drupal standard) | `texthtml/phpcs:latest` |
+| `phpcs-wordpress` / `phpcbf-wordpress` | PHP_CodeSniffer (WordPress standard) | `texthtml/phpcs:latest` |
+| `phpcs-cakephp` / `phpcbf-cakephp` | PHP_CodeSniffer (CakePHP standard) | `texthtml/phpcs:latest` |
+| `phpcs-yii` / `phpcbf-yii` | PHP_CodeSniffer (Yii standard) | `texthtml/phpcs:latest` |
+| `phpcs-laravel` / `phpcbf-laravel` | PHP_CodeSniffer (Laravel standard) | `texthtml/phpcs:latest` |
 
 > **Note:** `phpcs-d` and `phpcbf-d` (Drupal, local) are thin wrappers around `~/.composer/vendor/bin/phpcs` and require a local Composer-installed copy of `drupal/coder`. They do **not** use Docker.
+>
+> All `phpcs-*` / `phpcbf-*` Docker aliases share a single community-maintained image (`texthtml/phpcs`, actively updated with PHP_CodeSniffer 4.0.1). Configure framework-specific standards via a `.phpcs.xml` in your project root, or pass `--standard=...` directly.
 
 ### Python
 
@@ -209,7 +212,7 @@ Controls whether `-it` (interactive + TTY) is passed to `docker run`.
 
 ```bash
 # Disable TTY for use in a CI pipeline or script
-DOCKER_DEVTOOLS_TTY=never phpcs-docker src/
+DOCKER_DEVTOOLS_TTY=never phpcs-generic src/
 ```
 
 ### `DOCKER_DEVTOOLS_MAP_HOST_USER`
