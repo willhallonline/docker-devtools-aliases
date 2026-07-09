@@ -169,6 +169,39 @@ DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker some_file.py
 ```
 ```
 
+### Internet tools
+
+The `internet/docker-internet-devtools.sh` file contains aliases for infrastructure-as-code CLIs and cloud CLIs. This file is **not** sourced automatically — add it explicitly if you need it:
+
+```bash
+source ~/.docker-devtools/docker-devtools.sh
+source ~/.docker-devtools/internet/docker-internet-devtools.sh
+```
+
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/internet/docker-internet-devtools.ps1"
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `terraform-docker` | Terraform (official image) | `hashicorp/terraform:latest` |
+| `ansible-docker` / `ansible-playbook-docker` | Ansible / ansible-playbook | `willhallonline/ansible:latest` |
+| `pulumi-docker` | Pulumi (official image) | `pulumi/pulumi:latest` |
+| `az-docker` | Azure CLI (official image) | `mcr.microsoft.com/azure-cli:latest` |
+| `aws-docker` | AWS CLI (official image) | `amazon/aws-cli:latest` |
+| `gcloud-docker` | Google Cloud CLI (official image) | `google/cloud-sdk:latest` |
+
+```bash
+# Run a Terraform plan
+terraform-docker plan
+
+# Run an Ansible playbook
+ansible-playbook-docker site.yml
+```
+
 ## Usage examples
 
 All aliases mount the **current working directory** into the container and run the tool there. Arguments after the alias are forwarded directly to the tool.
