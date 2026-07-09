@@ -169,6 +169,56 @@ DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker some_file.py
 ```
 ```
 
+### Internet tools
+
+The `internet/docker-internet-devtools.sh` file contains aliases for infrastructure-as-code CLIs, cloud CLIs, local cloud emulators, and common server containers. This file is **not** sourced automatically — add it explicitly if you need it:
+
+```bash
+source ~/.docker-devtools/docker-devtools.sh
+source ~/.docker-devtools/internet/docker-internet-devtools.sh
+```
+
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/internet/docker-internet-devtools.ps1"
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `terraform-docker` | Terraform (official image) | `hashicorp/terraform:latest` |
+| `ansible-docker` / `ansible-playbook-docker` | Ansible / ansible-playbook | `willhallonline/ansible:latest` |
+| `pulumi-docker` | Pulumi (official image) | `pulumi/pulumi:latest` |
+| `az-docker` | Azure CLI (official image) | `mcr.microsoft.com/azure-cli:latest` |
+| `aws-docker` | AWS CLI (official image) | `amazon/aws-cli:latest` |
+| `gcloud-docker` | Google Cloud CLI (official image) | `google/cloud-sdk:latest` |
+| `floci-docker` | [Floci](https://github.com/floci-io/floci) AWS local emulator (detached service, port 4566) | `floci/floci:latest` |
+| `localstack-docker` | [LocalStack](https://github.com/localstack/localstack) AWS local emulator (detached service, port 4566) | `localstack/localstack:latest` |
+| `prometheus-docker` | Prometheus (detached service, port 9090, reads `./prometheus.yml`) | `prom/prometheus:latest` |
+| `grafana-docker` | Grafana (detached service, port 3000, default `admin`/`admin`) | `grafana/grafana:latest` |
+| `nginx-docker` | Nginx (detached service, port 8080, serves current directory read-only) | `nginx:latest` |
+| `apache-docker` | Apache httpd (detached service, port 8081, serves current directory read-only) | `httpd:latest` |
+| `postgresql-docker` | PostgreSQL (detached service, port 5432, default password `postgres`) | `postgres:latest` |
+| `mariadb-docker` | MariaDB (detached service, port 3306, default root password `mariadb`) | `mariadb:latest` |
+
+> **Note:** The CLI aliases (`terraform-docker`, `ansible-docker`, `pulumi-docker`, `az-docker`, `aws-docker`, `gcloud-docker`) run in the foreground via `docker_alias`, same as every other tool in this project.
+>
+> The remaining aliases start long-lived containers **detached** in the background via a second helper, `docker_service_alias` (`Invoke-DockerServiceAlias` in PowerShell) — each container is named `devtools-<tool>` so you can stop it with `docker stop devtools-nginx` (etc.). `postgresql-docker` and `mariadb-docker` persist data in named Docker volumes (`devtools-postgresql-data`, `devtools-mariadb-data`) rather than the current directory. Override defaults (passwords, ports) with `DOCKER_DEVTOOLS_EXTRA_ARGS`, e.g. `DOCKER_DEVTOOLS_EXTRA_ARGS="-e POSTGRES_PASSWORD=secret" postgresql-docker`.
+
+```bash
+# Run a Terraform plan
+terraform-docker plan
+
+# Run an Ansible playbook
+ansible-playbook-docker site.yml
+
+# Start LocalStack and Nginx in the background, then stop them
+localstack-docker
+nginx-docker
+docker stop devtools-localstack devtools-nginx
+```
+
 ## Usage examples
 
 All aliases mount the **current working directory** into the container and run the tool there. Arguments after the alias are forwarded directly to the tool.
@@ -264,7 +314,7 @@ A shell-based test harness is included. It stubs out Docker and the alias sub-fi
 bash tests/run_tests.sh
 ```
 
-Requires bash 4+. All 42 assertions cover argument validation, TTY mode, host-user mapping, extra args, entrypoint overrides, and error handling.
+Requires bash 4+. All 60 assertions cover argument validation, TTY mode, host-user mapping, extra args, entrypoint overrides, `docker_service_alias` (detached services), and error handling.
 
 A matching PowerShell test harness (`tests/run_tests.ps1`) covers the same scenarios for the `.ps1` scripts:
 
