@@ -158,51 +158,6 @@ try {
     $errOutput = Invoke-DockerAlias /app myimage:tag -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1
     Remove-Item Env:\DOCKER_DEVTOOLS_MAP_HOST_USER
     assert-contains 'invalid-bool: stderr message' 'invalid DOCKER_DEVTOOLS_MAP_HOST_USER value' ($errVar -join ' ')
-    Write-Host ''
-    Write-Host 'Invoke-DockerServiceAlias: argument validation'
-    $errOutput = $(Invoke-DockerServiceAlias -ContainerName '' -Image '' -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1)
-    assert-contains 'service-too-few-args: stderr message' 'requires a container name and image' ($errVar -join ' ')
-
-    Write-Host ''
-    Write-Host 'Invoke-DockerServiceAlias: basic argv construction'
-    Invoke-DockerServiceAlias devtools-nginx nginx:latest -ServiceArgs @('-p', '8080:80', '-v', '/tmp:/usr/share/nginx/html:ro')
-    $argv = _read-stub
-    assert-eq 'service-basic: run sub-command' 'run' $argv[0]
-    assert-eq 'service-basic: -d flag' '-d' $argv[1]
-    assert-eq 'service-basic: --rm flag' '--rm' $argv[2]
-    assert-contains 'service-basic: --name flag' '--name' ($argv -join ' ')
-    assert-contains 'service-basic: container name' 'devtools-nginx' ($argv -join ' ')
-    assert-contains 'service-basic: port mapping' '8080:80' ($argv -join ' ')
-    assert-contains 'service-basic: image present' 'nginx:latest' ($argv -join ' ')
-    assert-not-contains 'service-basic: host user mapping disabled by default' '--user' ($argv -join ' ')
-
-    Write-Host ''
-    Write-Host 'Invoke-DockerServiceAlias: command override passthrough'
-    Invoke-DockerServiceAlias devtools-postgresql postgres:latest -ServiceArgs @('-e', 'POSTGRES_PASSWORD=postgres') --extra-flag
-    $argv = _read-stub
-    assert-contains 'service-override: env var present' 'POSTGRES_PASSWORD=postgres' ($argv -join ' ')
-    assert-contains 'service-override: passthrough flag' '--extra-flag' ($argv -join ' ')
-
-    if (-not $IsWindows) {
-        Write-Host ''
-        Write-Host 'Invoke-DockerServiceAlias: DOCKER_DEVTOOLS_MAP_HOST_USER'
-        $env:DOCKER_DEVTOOLS_MAP_HOST_USER = 'true'
-        Invoke-DockerServiceAlias devtools-nginx nginx:latest
-        Remove-Item Env:\DOCKER_DEVTOOLS_MAP_HOST_USER
-        $argv = _read-stub
-        $uid = (id -u); $gid = (id -g)
-        assert-contains 'service-map-host-user: user flag present' '--user' ($argv -join ' ')
-        assert-contains 'service-map-host-user: uid gid present' "${uid}:${gid}" ($argv -join ' ')
-    }
-
-    Write-Host ''
-    Write-Host 'Invoke-DockerServiceAlias: DOCKER_DEVTOOLS_EXTRA_ARGS'
-    $env:DOCKER_DEVTOOLS_EXTRA_ARGS = '--network host'
-    Invoke-DockerServiceAlias devtools-nginx nginx:latest
-    Remove-Item Env:\DOCKER_DEVTOOLS_EXTRA_ARGS
-    $argv = _read-stub
-    assert-contains 'service-extra-args: network flag present' '--network' ($argv -join ' ')
-    assert-contains 'service-extra-args: network value present' 'host' ($argv -join ' ')
 }
 finally {
     Remove-Item -Recurse -Force $TmpDir -ErrorAction SilentlyContinue

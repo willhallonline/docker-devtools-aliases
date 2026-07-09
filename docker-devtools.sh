@@ -98,57 +98,6 @@ function docker_alias() {
     docker "${docker_args[@]}"
 }
 
-function docker_service_alias() {
-    local container_name image
-    local -a docker_args service_args extra_args
-
-    if [ "$#" -lt 2 ]; then
-        echo "docker-devtools: docker_service_alias requires a container name and image." >&2
-        return 2
-    fi
-
-    if ! command -v docker >/dev/null 2>&1; then
-        echo "docker-devtools: docker is not installed or not in PATH." >&2
-        return 127
-    fi
-
-    container_name=$1
-    image=$2
-    shift 2
-
-    docker_args=(run -d --rm --name "$container_name")
-
-    # Everything up to a literal "--" is docker run options (ports, env,
-    # volumes) baked into the alias definition. Anything after "--" is
-    # forwarded to the container's command as an override.
-    service_args=()
-    while [ "$#" -gt 0 ] && [ "$1" != "--" ]; do
-        service_args+=("$1")
-        shift
-    done
-    [ "${1-}" = "--" ] && shift
-
-    docker_args+=("${service_args[@]}")
-
-    if _docker_devtools_parse_bool DOCKER_DEVTOOLS_MAP_HOST_USER "${DOCKER_DEVTOOLS_MAP_HOST_USER:-}"; then
-        docker_args+=(--user "$(id -u):$(id -g)")
-    else
-        case $? in
-            1) ;;
-            2) return 2 ;;
-        esac
-    fi
-
-    if [ -n "${DOCKER_DEVTOOLS_EXTRA_ARGS:-}" ]; then
-        read -r -a extra_args <<< "${DOCKER_DEVTOOLS_EXTRA_ARGS}"
-        docker_args+=("${extra_args[@]}")
-    fi
-
-    docker_args+=("$image" "$@")
-
-    docker "${docker_args[@]}"
-}
-
 function _docker_devtools_source() {
     local alias_file
     alias_file=$1

@@ -98,63 +98,6 @@ function Invoke-DockerAlias {
     & docker @dockerArgs
 }
 
-function Invoke-DockerServiceAlias {
-    <#
-        .SYNOPSIS
-        Runs a long-lived container (database, web server, emulator, etc.) in detached mode.
-
-        .DESCRIPTION
-        PowerShell equivalent of the docker_service_alias bash function. Starts
-        -ContainerName from -Image detached (-d --rm), passing -ServiceArgs
-        (ports, volumes, env vars) baked into the alias, then forwards any
-        remaining arguments as a command override.
-    #>
-    param(
-        [Parameter(Position = 0)] [string] $ContainerName,
-        [Parameter(Position = 1)] [string] $Image,
-        [Parameter()] [string[]] $ServiceArgs = @(),
-        [Parameter(ValueFromRemainingArguments = $true)] [string[]] $Rest
-    )
-
-    if (-not $ContainerName -or -not $Image) {
-        Write-Error 'docker-devtools: Invoke-DockerServiceAlias requires a container name and image.'
-        return
-    }
-
-    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-        Write-Error 'docker-devtools: docker is not installed or not in PATH.'
-        return
-    }
-
-    $dockerArgs = [System.Collections.Generic.List[string]]::new()
-    $dockerArgs.Add('run')
-    $dockerArgs.Add('-d')
-    $dockerArgs.Add('--rm')
-    $dockerArgs.Add('--name')
-    $dockerArgs.Add($ContainerName)
-
-    foreach ($a in $ServiceArgs) { $dockerArgs.Add($a) }
-
-    $mapHostUser = Test-DockerDevToolsBool -Name 'DOCKER_DEVTOOLS_MAP_HOST_USER' -Value $env:DOCKER_DEVTOOLS_MAP_HOST_USER
-    if ($null -eq $mapHostUser) { return }
-    if ($mapHostUser -and -not $IsWindows) {
-        $uid = (id -u)
-        $gid = (id -g)
-        $dockerArgs.Add('--user')
-        $dockerArgs.Add("${uid}:${gid}")
-    }
-
-    if ($env:DOCKER_DEVTOOLS_EXTRA_ARGS) {
-        $extraArgs = $env:DOCKER_DEVTOOLS_EXTRA_ARGS -split '\s+' | Where-Object { $_ -ne '' }
-        foreach ($a in $extraArgs) { $dockerArgs.Add($a) }
-    }
-
-    $dockerArgs.Add($Image)
-    if ($Rest) { foreach ($a in $Rest) { $dockerArgs.Add($a) } }
-
-    & docker @dockerArgs
-}
-
 $script:DockerDevToolsDir = $PSScriptRoot
 
 # NOTE: dot-sourcing must happen directly in this script's scope (not inside a
