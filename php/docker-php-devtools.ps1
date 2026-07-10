@@ -44,4 +44,5 @@ New-PhpcsPair -Name wordpress
 New-PhpcsPair -Name drupal    -ExtraArgs '--extensions=php,inc,install,module,theme'
 New-PhpcsPair -Name yii
 New-PhpcsPair -Name laravel
+New-PhpcsPair -Name symfony
 New-PhpcsPair -Name generic   # Generic PSR-12 / custom standards
