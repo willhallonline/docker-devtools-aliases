@@ -54,10 +54,12 @@ New-Item -ItemType Directory -Path $TmpDir | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $TmpDir 'php') | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $TmpDir 'js') | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $TmpDir 'python') | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $TmpDir 'java') | Out-Null
 Copy-Item (Join-Path $RepoRoot 'docker-devtools.ps1') $TmpDir
 New-Item -ItemType File -Path (Join-Path $TmpDir 'php/docker-php-devtools.ps1') | Out-Null
 New-Item -ItemType File -Path (Join-Path $TmpDir 'js/docker-js-devtools.ps1') | Out-Null
 New-Item -ItemType File -Path (Join-Path $TmpDir 'python/docker-python-devtools.ps1') | Out-Null
+New-Item -ItemType File -Path (Join-Path $TmpDir 'java/docker-java-devtools.ps1') | Out-Null
 
 try {
     . (Join-Path $TmpDir 'docker-devtools.ps1')
