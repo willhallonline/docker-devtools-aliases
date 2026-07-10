@@ -25,3 +25,15 @@ function aws-docker { Invoke-DockerAlias /aws amazon/aws-cli:latest @args }
 
 # Google Cloud CLI (official image, no fixed entrypoint) — usage: gcloud-docker version
 function gcloud-docker { Invoke-DockerAlias /app google/cloud-sdk:latest gcloud @args }
+
+# ── Kubernetes ────────────────────────────────────────────────────────────────
+
+# kubectl (Bitnami image, entrypoint is already `kubectl`) — usage: kubectl-docker get pods
+function kubectl-docker { Invoke-DockerAlias /app bitnami/kubectl:latest @args }
+
+# k9s (derailed/k9s image, entrypoint is already `k9s`) — usage: k9s-docker
+function k9s-docker { Invoke-DockerAlias /app derailed/k9s:latest @args }
+
+# kubeadm (kind's node image, which bundles kubeadm; no standalone official
+# kubeadm image exists) — usage: kubeadm-docker version
+function kubeadm-docker { Invoke-DockerAlias /app kindest/node:latest --entrypoint kubeadm @args }
