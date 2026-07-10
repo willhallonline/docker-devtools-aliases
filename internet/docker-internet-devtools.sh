@@ -1,6 +1,6 @@
 # Internet Tools
 #
-# Aliases for infrastructure-as-code CLIs and cloud CLIs. This file is NOT
+# Aliases for infrastructure-as-code CLIs, cloud CLIs, and Kubernetes tools. This file is NOT
 # sourced automatically — add it explicitly if you need it:
 #
 #   source ~/.docker-devtools/docker-devtools.sh
@@ -32,8 +32,15 @@ alias gcloud-docker="docker_alias /app google/cloud-sdk:latest gcloud"
 
 # ── Kubernetes ────────────────────────────────────────────────────────────────
 
-# kubectl (official image) — usage: kubectl-docker get pods
+# kubectl (Bitnami image, entrypoint is already `kubectl`) — usage: kubectl-docker get pods
 alias kubectl-docker="docker_alias /app bitnami/kubectl:latest"
+
+# k9s (derailed/k9s image, entrypoint is already `k9s`) — usage: k9s-docker
+alias k9s-docker="docker_alias /app derailed/k9s:latest"
+
+# kubeadm (kind's node image, which bundles kubeadm; no standalone official
+# kubeadm image exists) — usage: kubeadm-docker version
+alias kubeadm-docker="docker_alias /app kindest/node:latest --entrypoint kubeadm"
 
 # Helm (official image) — usage: helm-docker install my-release ./chart
 alias helm-docker="docker_alias /app alpine/helm:latest"

@@ -200,6 +200,42 @@ bundle-docker install
 rubocop-docker -A .
 ```
 
+### Java
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `java-docker` | Java REPL / scripts | `eclipse-temurin:21-jdk` |
+| `javac-docker` | Java compiler | `eclipse-temurin:21-jdk` |
+| `java-bash-docker` | Interactive bash in a JDK container | `eclipse-temurin:21-jdk` |
+| `mvn-docker` | Maven (official image) | `maven:3-eclipse-temurin-21` |
+| `gradle-docker` | Gradle (official image) | `gradle:jdk21` |
+| `checkstyle-docker` | Checkstyle style/convention checker | `eclipse-temurin:21-jre` (downloads the official `-all.jar` at runtime) |
+| `spotbugs-docker` | SpotBugs static analysis (bug patterns in compiled `.class` files) | `eclipse-temurin:21-jdk` (downloads the official release `.tgz` at runtime) |
+| `pmd-docker` | PMD static source code analyzer (rule-based) | `eclipse-temurin:21-jdk` (downloads the official release `.zip` at runtime) |
+| `google-java-format-docker` | google-java-format code formatter | `eclipse-temurin:21-jdk` (downloads the official `-all-deps.jar` at runtime) |
+
+> **Note:** there's no actively-maintained, purpose-built image for Checkstyle, SpotBugs, PMD, or google-java-format, so each alias downloads the project's own pinned official release artifact into an ephemeral `eclipse-temurin` container and runs it directly. This adds a few seconds per invocation (nothing is cached between runs, since containers are removed with `--rm`) but avoids depending on an unmaintained third-party image. Bump the pinned versions at the top of `java/docker-java-devtools.sh` / `java/docker-java-devtools.ps1` to upgrade.
+>
+> **PowerShell users:** quote flags that contain a `.` or `:` right after a leading dash (e.g. `mvn-docker "-Dmaven.test.skip=true"`, `spotbugs-docker -textui "-effort:max"`). PowerShell's own tokenizer splits such flags apart when they're left unquoted — this is standard PowerShell parsing behavior, not specific to these aliases.
+
+```bash
+# Check a single file against Google's Checkstyle rules
+checkstyle-docker -c /google_checks.xml src/Main.java
+
+# Run PMD's quickstart ruleset against a source tree
+pmd-docker check -d src -R rulesets/java/quickstart.xml -f text
+
+# Run SpotBugs against compiled classes
+javac-docker -d out src/Main.java
+spotbugs-docker -textui -effort:max out
+
+# Format a file in place
+google-java-format-docker -i src/Main.java
+
+# Build with Maven, skipping tests
+mvn-docker -Dmaven.test.skip=true install
+```
+
 ### Images
 
 The `images/docker-image-devtools.sh` file contains image-conversion, resizing, and optimisation aliases. This file is **not** sourced automatically — add it explicitly if you need it:
@@ -282,7 +318,7 @@ DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker some_file.py
 
 ### Internet tools
 
-The `internet/docker-internet-devtools.sh` file contains aliases for infrastructure-as-code CLIs and cloud CLIs. This file is **not** sourced automatically — add it explicitly if you need it:
+The `internet/docker-internet-devtools.sh` file contains aliases for infrastructure-as-code CLIs, cloud CLIs, and Kubernetes tools. This file is **not** sourced automatically — add it explicitly if you need it:
 
 ```bash
 source ~/.docker-devtools/docker-devtools.sh
@@ -304,7 +340,9 @@ In PowerShell:
 | `az-docker` | Azure CLI (official image) | `mcr.microsoft.com/azure-cli:latest` |
 | `aws-docker` | AWS CLI (official image) | `amazon/aws-cli:latest` |
 | `gcloud-docker` | Google Cloud CLI (official image) | `google/cloud-sdk:latest` |
-| `kubectl-docker` | Kubernetes CLI (official image) | `bitnami/kubectl:latest` |
+| `kubectl-docker` | kubectl (Bitnami image) | `bitnami/kubectl:latest` |
+| `k9s-docker` | k9s (derailed/k9s image) | `derailed/k9s:latest` |
+| `kubeadm-docker` | kubeadm (kind's node image; no standalone official kubeadm image exists) | `kindest/node:latest` |
 | `helm-docker` | Helm chart manager (official image) | `alpine/helm:latest` |
 | `packer-docker` | HashiCorp Packer (official image) | `hashicorp/packer:latest` |
 
@@ -315,8 +353,14 @@ terraform-docker plan
 # Run an Ansible playbook
 ansible-playbook-docker site.yml
 
-# Apply a Kubernetes manifest
-kubectl-docker apply -f deployment.yml
+# List pods with kubectl
+kubectl-docker get pods
+
+# Browse the cluster with k9s
+k9s-docker
+
+# Check the kubeadm version
+kubeadm-docker version
 
 # Install a Helm chart
 helm-docker install my-release ./chart
