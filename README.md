@@ -77,6 +77,7 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 | `phpcs-cakephp` / `phpcbf-cakephp` | PHP_CodeSniffer (CakePHP standard) | `texthtml/phpcs:latest` |
 | `phpcs-yii` / `phpcbf-yii` | PHP_CodeSniffer (Yii standard) | `texthtml/phpcs:latest` |
 | `phpcs-laravel` / `phpcbf-laravel` | PHP_CodeSniffer (Laravel standard) | `texthtml/phpcs:latest` |
+| `phpcs-symfony` / `phpcbf-symfony` | PHP_CodeSniffer (Symfony standard) | `texthtml/phpcs:latest` |
 
 > **Note:** `phpcs-d` and `phpcbf-d` (Drupal, local) are thin wrappers around `~/.composer/vendor/bin/phpcs` and require a local Composer-installed copy of `drupal/coder`. They do **not** use Docker.
 >
