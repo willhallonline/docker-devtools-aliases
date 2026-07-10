@@ -36,16 +36,35 @@ function Invoke-DockerAlias {
         PowerShell equivalent of the docker_alias bash function. Mounts $PWD into
         the container at -WorkingDir, runs -Image (optionally with a command),
         and forwards any remaining arguments to the containerized process.
+        An optional "--entrypoint <name>" pair immediately after the image
+        overrides the container's baked-in entrypoint.
+
+        This is intentionally a "basic" (non-advanced) function — it has no
+        [Parameter()]/[CmdletBinding()] attributes — so that PowerShell does not
+        layer on the common parameters (-ErrorAction, -OutVariable, etc.). If it
+        were advanced, single-dash passthrough flags like "-o" (used by cwebp)
+        would be ambiguously prefix-matched against "-OutVariable"/"-OutBuffer"
+        and rejected instead of being forwarded to the containerized process.
     #>
-    param(
-        [Parameter(Position = 0)] [string] $WorkingDir,
-        [Parameter(Position = 1)] [string] $Image,
-        [Parameter(ValueFromRemainingArguments = $true)] [string[]] $Rest
-    )
+    param($WorkingDir, $Image)
+    $Rest = $args
 
     if (-not $WorkingDir -or -not $Image) {
         Write-Error 'docker-devtools: Invoke-DockerAlias requires a working directory and image.'
         return
+    }
+
+    # Optional --entrypoint <name> immediately after the image, used to
+    # override a container's baked-in entrypoint (e.g. selecting a specific
+    # binary out of a multi-tool image).
+    $entrypoint = $null
+    if ($Rest -and $Rest.Count -gt 0 -and $Rest[0] -eq '--entrypoint') {
+        if ($Rest.Count -lt 2 -or [string]::IsNullOrEmpty($Rest[1])) {
+            Write-Error 'docker-devtools: --entrypoint requires a value.'
+            return
+        }
+        $entrypoint = $Rest[1]
+        $Rest = if ($Rest.Count -gt 2) { $Rest[2..($Rest.Count - 1)] } else { @() }
     }
 
     if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
@@ -77,6 +96,11 @@ function Invoke-DockerAlias {
     $dockerArgs.Add("$($PWD.Path):$WorkingDir")
     $dockerArgs.Add('-w')
     $dockerArgs.Add($WorkingDir)
+
+    if ($entrypoint) {
+        $dockerArgs.Add('--entrypoint')
+        $dockerArgs.Add($entrypoint)
+    }
 
     $mapHostUser = Test-DockerDevToolsBool -Name 'DOCKER_DEVTOOLS_MAP_HOST_USER' -Value $env:DOCKER_DEVTOOLS_MAP_HOST_USER
     if ($null -eq $mapHostUser) { return }
