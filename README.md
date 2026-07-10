@@ -97,6 +97,41 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 | `mypy-docker` | Mypy static type checker | `cytopia/mypy:latest` |
 | `bandit-docker` | Bandit security linter | `cytopia/bandit:latest` |
 
+### Java
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `java-docker` | Java REPL / scripts | `eclipse-temurin:21-jdk` |
+| `javac-docker` | Java compiler | `eclipse-temurin:21-jdk` |
+| `java-bash-docker` | Interactive bash in a JDK container | `eclipse-temurin:21-jdk` |
+| `mvn-docker` | Maven (official image) | `maven:3-eclipse-temurin-21` |
+| `gradle-docker` | Gradle (official image) | `gradle:jdk21` |
+| `checkstyle-docker` | Checkstyle style/convention checker | `eclipse-temurin:21-jre` (downloads the official `-all.jar` at runtime) |
+| `spotbugs-docker` | SpotBugs static analysis (bug patterns in compiled `.class` files) | `eclipse-temurin:21-jdk` (downloads the official release `.tgz` at runtime) |
+| `pmd-docker` | PMD static source code analyzer (rule-based) | `eclipse-temurin:21-jdk` (downloads the official release `.zip` at runtime) |
+| `google-java-format-docker` | google-java-format code formatter | `eclipse-temurin:21-jdk` (downloads the official `-all-deps.jar` at runtime) |
+
+> **Note:** there's no actively-maintained, purpose-built image for Checkstyle, SpotBugs, PMD, or google-java-format, so each alias downloads the project's own pinned official release artifact into an ephemeral `eclipse-temurin` container and runs it directly. This adds a few seconds per invocation (nothing is cached between runs, since containers are removed with `--rm`) but avoids depending on an unmaintained third-party image. Bump the pinned versions at the top of `java/docker-java-devtools.sh` / `java/docker-java-devtools.ps1` to upgrade.
+>
+> **PowerShell users:** quote flags that contain a `.` or `:` right after a leading dash (e.g. `mvn-docker "-Dmaven.test.skip=true"`, `spotbugs-docker -textui "-effort:max"`). PowerShell's own tokenizer splits such flags apart when they're left unquoted — this is standard PowerShell parsing behavior, not specific to these aliases.
+
+```bash
+# Check a single file against Google's Checkstyle rules
+checkstyle-docker -c /google_checks.xml src/Main.java
+
+# Run PMD's quickstart ruleset against a source tree
+pmd-docker check -d src -R rulesets/java/quickstart.xml -f text
+
+# Run SpotBugs against compiled classes
+javac-docker -d out src/Main.java
+spotbugs-docker -textui -effort:max out
+
+# Format a file in place
+google-java-format-docker -i src/Main.java
+
+# Build with Maven, skipping tests
+mvn-docker -Dmaven.test.skip=true install
+```
 
 ### Images
 
