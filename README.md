@@ -202,6 +202,60 @@ terraform-docker plan
 ansible-playbook-docker site.yml
 ```
 
+### Linux tools
+
+The `linux/docker-linux-devtools.sh` file contains aliases for common Linux command-line utilities. This file is **not** sourced automatically — add it explicitly if you need it:
+
+```bash
+source ~/.docker-devtools/docker-devtools.sh
+source ~/.docker-devtools/linux/docker-linux-devtools.sh
+```
+
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/linux/docker-linux-devtools.ps1"
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `yamllint-docker` | yamllint — YAML linter | `cytopia/yamllint:latest` |
+| `shellcheck-docker` | ShellCheck — shell script linter (official image) | `koalaman/shellcheck:stable` |
+| `shfmt-docker` | shfmt (bashfmt) — shell script formatter (official image) | `mvdan/shfmt:latest` |
+| `nmap-docker` | Nmap — network discovery and security auditing | `instrumentisto/nmap:latest` |
+| `jq-docker` | jq — command-line JSON processor (official image) | `ghcr.io/jqlang/jq:latest` |
+| `rg-docker` | ripgrep — fast recursive grep alternative | `alpine:latest` (installs `ripgrep` at runtime) |
+| `tmux-docker` | tmux — terminal multiplexer | `alpine:latest` (installs `tmux` at runtime) |
+| `fd-docker` | fd — fast, user-friendly alternative to `find` | `alpine:latest` (installs `fd` at runtime) |
+| `rsync-docker` | rsync — fast incremental file transfer/sync | `instrumentisto/rsync-ssh:latest` |
+| `rclone-docker` | rclone — sync/manage files across cloud storage providers (official image) | `rclone/rclone:latest` |
+| `watchdog-docker` | watchdog's `watchmedo` — run commands on filesystem changes | `python:3.13-slim` (installs `watchdog` at runtime) |
+
+> **Note:** `rg-docker`, `tmux-docker`, `fd-docker`, and `watchdog-docker` have no official pre-built image, so they install the package into a fresh container on every run (a few extra seconds per invocation).
+
+```bash
+# Lint a YAML file
+yamllint-docker config.yml
+
+# Lint and format a shell script
+shellcheck-docker script.sh
+shfmt-docker -l -w script.sh
+
+# Scan a host
+nmap-docker -A -T4 scanme.nmap.org
+
+# Query JSON
+jq-docker '.' data.json
+
+# Search recursively for a pattern
+rg-docker "TODO"
+
+# Sync files
+rsync-docker -av src/ dest/
+rclone-docker ls remote:bucket
+```
+
 ## Usage examples
 
 All aliases mount the **current working directory** into the container and run the tool there. Arguments after the alias are forwarded directly to the tool.
