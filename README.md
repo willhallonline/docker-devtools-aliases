@@ -214,7 +214,7 @@ DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker some_file.py
 
 ### Internet tools
 
-The `internet/docker-internet-devtools.sh` file contains aliases for infrastructure-as-code CLIs and cloud CLIs. This file is **not** sourced automatically — add it explicitly if you need it:
+The `internet/docker-internet-devtools.sh` file contains aliases for infrastructure-as-code CLIs, cloud CLIs, and Kubernetes tools. This file is **not** sourced automatically — add it explicitly if you need it:
 
 ```bash
 source ~/.docker-devtools/docker-devtools.sh
@@ -236,6 +236,9 @@ In PowerShell:
 | `az-docker` | Azure CLI (official image) | `mcr.microsoft.com/azure-cli:latest` |
 | `aws-docker` | AWS CLI (official image) | `amazon/aws-cli:latest` |
 | `gcloud-docker` | Google Cloud CLI (official image) | `google/cloud-sdk:latest` |
+| `kubectl-docker` | kubectl (Bitnami image) | `bitnami/kubectl:latest` |
+| `k9s-docker` | k9s (derailed/k9s image) | `derailed/k9s:latest` |
+| `kubeadm-docker` | kubeadm (kind's node image; no standalone official kubeadm image exists) | `kindest/node:latest` |
 
 ```bash
 # Run a Terraform plan
@@ -243,6 +246,15 @@ terraform-docker plan
 
 # Run an Ansible playbook
 ansible-playbook-docker site.yml
+
+# List pods with kubectl
+kubectl-docker get pods
+
+# Browse the cluster with k9s
+k9s-docker
+
+# Check the kubeadm version
+kubeadm-docker version
 ```
 
 ### Linux tools
