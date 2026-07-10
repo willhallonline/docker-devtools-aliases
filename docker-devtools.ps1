@@ -126,7 +126,7 @@ $script:DockerDevToolsDir = $PSScriptRoot
 
 # NOTE: dot-sourcing must happen directly in this script's scope (not inside a
 # function) so the functions/aliases they define land in the caller's scope.
-foreach ($relativePath in @('php/docker-php-devtools.ps1', 'js/docker-js-devtools.ps1')) {
+foreach ($relativePath in @('php/docker-php-devtools.ps1', 'js/docker-js-devtools.ps1', 'python/docker-python-devtools.ps1')) {
     $alias_file = Join-Path $script:DockerDevToolsDir $relativePath
 
     if (-not (Test-Path -LiteralPath $alias_file)) {

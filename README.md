@@ -49,7 +49,7 @@ Reload your profile, or open a new session:
 . $PROFILE
 ```
 
-The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php/docker-php-devtools.ps1`, `images/docker-image-devtools.ps1`) mirror the bash versions tool-for-tool and work on Windows PowerShell 5.1+ and cross-platform PowerShell 7+ (`pwsh` on Linux/macOS). Bash `alias`es become PowerShell functions of the same name (e.g. `node-docker`, `phpcs-drupal`), since PowerShell aliases can't carry baked-in arguments.
+The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php/docker-php-devtools.ps1`, `python/docker-python-devtools.ps1`, `images/docker-image-devtools.ps1`, `ai/docker-ai-devtools.ps1`) mirror the bash versions tool-for-tool and work on Windows PowerShell 5.1+ and cross-platform PowerShell 7+ (`pwsh` on Linux/macOS). Bash `alias`es become PowerShell functions of the same name (e.g. `node-docker`, `phpcs-drupal`), since PowerShell aliases can't carry baked-in arguments. Every tool documented below — including image tools and AI tools — is available in both bash and PowerShell.
 
 ## Available tools
 
@@ -147,6 +147,13 @@ source ~/.docker-devtools/docker-devtools.sh
 source ~/.docker-devtools/ai/docker-ai-devtools.sh
 ```
 
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/ai/docker-ai-devtools.ps1"
+```
+
 | Alias | Tool | Image |
 |-------|------|-------|
 | `markitdown-docker` | [MarkItDown](https://github.com/microsoft/markitdown) — converts PDFs, Office docs, images, audio, HTML, etc. to Markdown for LLMs | `python:3.13-slim` (installs `markitdown` at runtime) |
@@ -168,7 +175,6 @@ openwiki-docker --init
 
 # Let Aider edit a file with AI assistance
 DOCKER_DEVTOOLS_EXTRA_ARGS="-e OPENAI_API_KEY" aider-docker some_file.py
-```
 ```
 
 ### Internet tools
@@ -355,7 +361,7 @@ bash tests/run_tests.sh
 
 Requires bash 4+. All 42 assertions cover argument validation, TTY mode, host-user mapping, extra args, entrypoint overrides, and error handling.
 
-A matching PowerShell test harness (`tests/run_tests.ps1`) covers the same scenarios for the `.ps1` scripts:
+A matching PowerShell test harness (`tests/run_tests.ps1`) covers the same scenarios for the `.ps1` scripts, including `--entrypoint` overrides and short-flag passthrough (e.g. `-o`):
 
 ```powershell
 pwsh tests/run_tests.ps1
