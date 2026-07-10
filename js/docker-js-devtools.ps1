@@ -8,6 +8,9 @@ function eslint-docker { Invoke-DockerAlias /app pipelinecomponents/eslint:lates
 # Stylelint (via community image with Node 22 LTS)
 function stylelint-docker { Invoke-DockerAlias /app solutiondrive/stylelint:latest lint @args }
 
+# Prettier (community image)
+function prettier-docker { Invoke-DockerAlias /app tmknom/prettier:latest @args }
+
 # Runtime aliases
 #
 # Node.js (pinned to 22-alpine LTS)

@@ -59,6 +59,7 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 |-------|------|-------|
 | `stylelint-docker` | Stylelint CSS linter (community image) | `solutiondrive/stylelint:latest` |
 | `eslint-docker` | ESLint (community image) | `pipelinecomponents/eslint:latest` |
+| `prettier-docker` | Prettier code formatter (community image) | `tmknom/prettier:latest` |
 | `node-docker` | Node.js REPL / scripts | `node:22-alpine` |
 | `npm-docker` | npm | `node:22-alpine` |
 | `yarn-docker` | Yarn | `node:22-alpine` |
