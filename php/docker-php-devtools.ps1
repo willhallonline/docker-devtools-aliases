@@ -6,6 +6,17 @@
 function composer-docker { Invoke-DockerAlias /app composer:latest composer @args }
 function php-docker { Invoke-DockerAlias /app php:8.4-alpine php @args }
 
+# Static analysis & code style
+#
+# PHPStan — static analysis (official image)
+function phpstan-docker { Invoke-DockerAlias /app phpstan/phpstan:latest @args }
+
+# Psalm — static analysis (official image)
+function psalm-docker { Invoke-DockerAlias /app ghcr.io/vimeo/psalm:latest @args }
+
+# PHP-CS-Fixer — code style fixer (community image)
+function php-cs-fixer-docker { Invoke-DockerAlias /app cytopia/php-cs-fixer:latest @args }
+
 # PHP CodeSniffer — local binaries (Drupal Coder)
 # Requires a local Composer-installed copy of drupal/coder (~/.composer/vendor/drupal/coder).
 # These do NOT use Docker.

@@ -17,3 +17,9 @@ alias mypy-docker="docker_alias /app cytopia/mypy:latest mypy"
 
 # Bandit — security linter
 alias bandit-docker="docker_alias /app cytopia/bandit:latest bandit"
+
+# Ruff — fast linter/formatter (official image)
+alias ruff-docker="docker_alias /app ghcr.io/astral-sh/ruff:latest"
+
+# Poetry — dependency & package manager (community image)
+alias poetry-docker="docker_alias /app cytopia/poetry:latest poetry"

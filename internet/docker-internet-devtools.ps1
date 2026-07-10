@@ -25,3 +25,14 @@ function aws-docker { Invoke-DockerAlias /aws amazon/aws-cli:latest @args }
 
 # Google Cloud CLI (official image, no fixed entrypoint) — usage: gcloud-docker version
 function gcloud-docker { Invoke-DockerAlias /app google/cloud-sdk:latest gcloud @args }
+
+# ── Kubernetes ────────────────────────────────────────────────────────────────
+
+# kubectl (official image) — usage: kubectl-docker get pods
+function kubectl-docker { Invoke-DockerAlias /app bitnami/kubectl:latest @args }
+
+# Helm (official image) — usage: helm-docker install my-release ./chart
+function helm-docker { Invoke-DockerAlias /app alpine/helm:latest @args }
+
+# Packer (official image) — usage: packer-docker build template.pkr.hcl
+function packer-docker { Invoke-DockerAlias /app hashicorp/packer:latest @args }

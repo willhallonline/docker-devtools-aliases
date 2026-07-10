@@ -59,6 +59,9 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 |-------|------|-------|
 | `stylelint-docker` | Stylelint CSS linter (community image) | `solutiondrive/stylelint:latest` |
 | `eslint-docker` | ESLint (community image) | `pipelinecomponents/eslint:latest` |
+| `prettier-docker` | Prettier code formatter (via `npx`) | `node:22-alpine` |
+| `biome-docker` | Biome — combined fast linter + formatter (official image) | `ghcr.io/biomejs/biome:latest` |
+| `tsc-docker` | TypeScript compiler / type-checker (via `npx`) | `node:22-alpine` |
 | `node-docker` | Node.js REPL / scripts | `node:22-alpine` |
 | `npm-docker` | npm | `node:22-alpine` |
 | `yarn-docker` | Yarn | `node:22-alpine` |
@@ -71,6 +74,9 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 |-------|------|-------|
 | `composer-docker` | Composer package manager (official image) | `composer:latest` |
 | `php-docker` | PHP CLI / scripts | `php:8.4-alpine` |
+| `phpstan-docker` | PHPStan static analysis (official image) | `phpstan/phpstan:latest` |
+| `psalm-docker` | Psalm static analysis (official image) | `ghcr.io/vimeo/psalm:latest` |
+| `php-cs-fixer-docker` | PHP-CS-Fixer code style fixer (community image) | `cytopia/php-cs-fixer:latest` |
 | `phpcs-generic` / `phpcbf-generic` | PHP_CodeSniffer (generic, community image) | `texthtml/phpcs:latest` |
 | `phpcs-drupal` / `phpcbf-drupal` | PHP_CodeSniffer (Drupal standard) | `texthtml/phpcs:latest` |
 | `phpcs-wordpress` / `phpcbf-wordpress` | PHP_CodeSniffer (WordPress standard) | `texthtml/phpcs:latest` |
@@ -95,7 +101,104 @@ The PowerShell scripts (`docker-devtools.ps1`, `js/docker-js-devtools.ps1`, `php
 | `pylint-docker` | Pylint static analysis | `cytopia/pylint:latest` |
 | `mypy-docker` | Mypy static type checker | `cytopia/mypy:latest` |
 | `bandit-docker` | Bandit security linter | `cytopia/bandit:latest` |
+| `ruff-docker` | Ruff — fast linter/formatter (official image) | `ghcr.io/astral-sh/ruff:latest` |
+| `poetry-docker` | Poetry dependency/package manager (community image) | `cytopia/poetry:latest` |
 
+### Go
+
+The `go/docker-go-devtools.sh` file contains aliases for the Go toolchain. This file is **not** sourced automatically — add it explicitly if you need it:
+
+```bash
+source ~/.docker-devtools/docker-devtools.sh
+source ~/.docker-devtools/go/docker-go-devtools.sh
+```
+
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/go/docker-go-devtools.ps1"
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `go-docker` | Go CLI — build/run/test | `golang:alpine` |
+| `go-bash-docker` | Interactive shell in Go container | `golang:alpine` |
+| `gofmt-docker` | Go formatter (ships with the official image) | `golang:alpine` |
+| `golangci-lint-docker` | golangci-lint — Go meta-linter (official image) | `golangci/golangci-lint:latest` |
+
+```bash
+# Run tests
+go-docker test ./...
+
+# Lint
+golangci-lint-docker run ./...
+```
+
+### Rust
+
+The `rust/docker-rust-devtools.sh` file contains aliases for the Rust toolchain. This file is **not** sourced automatically — add it explicitly if you need it:
+
+```bash
+source ~/.docker-devtools/docker-devtools.sh
+source ~/.docker-devtools/rust/docker-rust-devtools.sh
+```
+
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/rust/docker-rust-devtools.ps1"
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `cargo-docker` | Cargo — build tool & package manager | `rust:alpine` |
+| `rust-bash-docker` | Interactive shell in Rust container | `rust:alpine` |
+| `rustfmt-docker` | rustfmt — Rust code formatter (ships with the official image) | `rust:alpine` |
+| `clippy-docker` | Clippy — Rust linter (ships with the official image) | `rust:alpine` |
+
+```bash
+# Build and test
+cargo-docker build
+cargo-docker test
+
+# Format and lint
+rustfmt-docker src/main.rs
+clippy-docker
+```
+
+### Ruby
+
+The `ruby/docker-ruby-devtools.sh` file contains aliases for the Ruby toolchain. This file is **not** sourced automatically — add it explicitly if you need it:
+
+```bash
+source ~/.docker-devtools/docker-devtools.sh
+source ~/.docker-devtools/ruby/docker-ruby-devtools.sh
+```
+
+In PowerShell:
+
+```powershell
+. "$HOME/.docker-devtools/docker-devtools.ps1"
+. "$HOME/.docker-devtools/ruby/docker-ruby-devtools.ps1"
+```
+
+| Alias | Tool | Image |
+|-------|------|-------|
+| `ruby-docker` | Ruby REPL / scripts | `ruby:alpine` |
+| `ruby-bash-docker` | Interactive shell in Ruby container | `ruby:alpine` |
+| `gem-docker` | RubyGems package manager | `ruby:alpine` |
+| `bundle-docker` | Bundler dependency manager | `ruby:alpine` |
+| `rubocop-docker` | RuboCop — Ruby style linter/formatter (community image) | `pipelinecomponents/rubocop:latest` |
+
+```bash
+# Install gems with Bundler
+bundle-docker install
+
+# Lint and auto-correct with RuboCop
+rubocop-docker -A .
+```
 
 ### Images
 
@@ -121,6 +224,7 @@ In PowerShell:
 | `identify-docker` | ImageMagick — image metadata/info | `dpokidov/imagemagick:latest` |
 | `vipsthumbnail-docker` | libvips — fast, low-memory thumbnailing/resizing | `marcbachmann/libvips:latest` |
 | `cwebp-docker` / `dwebp-docker` | WebP encode/decode | `takecy/webp:latest` |
+| `exiftool-docker` | ExifTool — read/write image & file metadata (community image) | `kroniak/exiftool:latest` |
 
 ```bash
 # Resize an image with ImageMagick
@@ -194,6 +298,9 @@ In PowerShell:
 | `az-docker` | Azure CLI (official image) | `mcr.microsoft.com/azure-cli:latest` |
 | `aws-docker` | AWS CLI (official image) | `amazon/aws-cli:latest` |
 | `gcloud-docker` | Google Cloud CLI (official image) | `google/cloud-sdk:latest` |
+| `kubectl-docker` | Kubernetes CLI (official image) | `bitnami/kubectl:latest` |
+| `helm-docker` | Helm chart manager (official image) | `alpine/helm:latest` |
+| `packer-docker` | HashiCorp Packer (official image) | `hashicorp/packer:latest` |
 
 ```bash
 # Run a Terraform plan
@@ -201,6 +308,12 @@ terraform-docker plan
 
 # Run an Ansible playbook
 ansible-playbook-docker site.yml
+
+# Apply a Kubernetes manifest
+kubectl-docker apply -f deployment.yml
+
+# Install a Helm chart
+helm-docker install my-release ./chart
 ```
 
 ### Linux tools
@@ -232,6 +345,8 @@ In PowerShell:
 | `rsync-docker` | rsync — fast incremental file transfer/sync | `instrumentisto/rsync-ssh:latest` |
 | `rclone-docker` | rclone — sync/manage files across cloud storage providers (official image) | `rclone/rclone:latest` |
 | `watchdog-docker` | watchdog's `watchmedo` — run commands on filesystem changes | `python:3.13-slim` (installs `watchdog` at runtime) |
+| `hadolint-docker` | hadolint — Dockerfile linter (official image) | `hadolint/hadolint:latest` |
+| `markdownlint-docker` | markdownlint-cli — Markdown linter (community image) | `igorshubovych/markdownlint-cli:latest` |
 
 > **Note:** `rg-docker`, `tmux-docker`, `fd-docker`, and `watchdog-docker` have no official pre-built image, so they install the package into a fresh container on every run (a few extra seconds per invocation).
 

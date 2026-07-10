@@ -6,6 +6,15 @@ alias eslint-docker="docker_alias /app pipelinecomponents/eslint:latest lint"
 # Stylelint (via community image with Node 22 LTS)
 alias stylelint-docker="docker_alias /app solutiondrive/stylelint:latest lint"
 
+# Prettier — code formatter (no fixed official image, run via npx on Node 22)
+alias prettier-docker="docker_alias /app node:22-alpine npx --yes prettier"
+
+# Biome — combined fast linter + formatter (official image)
+alias biome-docker="docker_alias /app ghcr.io/biomejs/biome:latest"
+
+# tsc — TypeScript compiler / type-checker (no fixed official image, run via npx on Node 22)
+alias tsc-docker="docker_alias /app node:22-alpine npx --yes typescript tsc"
+
 # Runtime aliases
 #
 # Node.js (pinned to 22-alpine LTS)

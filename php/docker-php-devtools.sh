@@ -4,6 +4,17 @@
 alias composer-docker="docker_alias /app composer:latest composer"
 alias php-docker="docker_alias /app php:8.4-alpine php"
 
+# Static analysis & code style
+#
+# PHPStan — static analysis (official image)
+alias phpstan-docker="docker_alias /app phpstan/phpstan:latest"
+
+# Psalm — static analysis (official image)
+alias psalm-docker="docker_alias /app ghcr.io/vimeo/psalm:latest"
+
+# PHP-CS-Fixer — code style fixer (community image)
+alias php-cs-fixer-docker="docker_alias /app cytopia/php-cs-fixer:latest"
+
 # PHP CodeSniffer
 #
 # Local binaries (Drupal Coder)

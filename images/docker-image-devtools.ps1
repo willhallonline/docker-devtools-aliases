@@ -25,3 +25,7 @@ function vipsthumbnail-docker { Invoke-DockerAlias /images marcbachmann/libvips:
 # dwebp-docker — usage: dwebp-docker input.webp -o output.png
 function cwebp-docker { Invoke-DockerAlias /images takecy/webp:latest --entrypoint cwebp @args }
 function dwebp-docker { Invoke-DockerAlias /images takecy/webp:latest --entrypoint dwebp @args }
+
+# ExifTool — read/write image & file metadata (community image)
+# usage: exiftool-docker -all= image.jpg
+function exiftool-docker { Invoke-DockerAlias /images kroniak/exiftool:latest @args }

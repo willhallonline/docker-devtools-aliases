@@ -29,3 +29,14 @@ alias aws-docker="docker_alias /aws amazon/aws-cli:latest"
 
 # Google Cloud CLI (official image, no fixed entrypoint) — usage: gcloud-docker version
 alias gcloud-docker="docker_alias /app google/cloud-sdk:latest gcloud"
+
+# ── Kubernetes ────────────────────────────────────────────────────────────────
+
+# kubectl (official image) — usage: kubectl-docker get pods
+alias kubectl-docker="docker_alias /app bitnami/kubectl:latest"
+
+# Helm (official image) — usage: helm-docker install my-release ./chart
+alias helm-docker="docker_alias /app alpine/helm:latest"
+
+# Packer (official image) — usage: packer-docker build template.pkr.hcl
+alias packer-docker="docker_alias /app hashicorp/packer:latest"
