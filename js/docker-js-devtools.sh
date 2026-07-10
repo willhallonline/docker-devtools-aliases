@@ -6,8 +6,8 @@ alias eslint-docker="docker_alias /app pipelinecomponents/eslint:latest lint"
 # Stylelint (via community image with Node 22 LTS)
 alias stylelint-docker="docker_alias /app solutiondrive/stylelint:latest lint"
 
-# Prettier — code formatter (no fixed official image, run via npx on Node 22)
-alias prettier-docker="docker_alias /app node:22-alpine npx --yes prettier"
+# Prettier (community image)
+alias prettier-docker="docker_alias /app tmknom/prettier:latest"
 
 # Biome — combined fast linter + formatter (official image)
 alias biome-docker="docker_alias /app ghcr.io/biomejs/biome:latest"

@@ -8,8 +8,8 @@ function eslint-docker { Invoke-DockerAlias /app pipelinecomponents/eslint:lates
 # Stylelint (via community image with Node 22 LTS)
 function stylelint-docker { Invoke-DockerAlias /app solutiondrive/stylelint:latest lint @args }
 
-# Prettier — code formatter (no fixed official image, run via npx on Node 22)
-function prettier-docker { Invoke-DockerAlias /app node:22-alpine npx --yes prettier @args }
+# Prettier (community image)
+function prettier-docker { Invoke-DockerAlias /app tmknom/prettier:latest @args }
 
 # Biome — combined fast linter + formatter (official image)
 function biome-docker { Invoke-DockerAlias /app ghcr.io/biomejs/biome:latest @args }
