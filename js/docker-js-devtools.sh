@@ -6,6 +6,9 @@ alias eslint-docker="docker_alias /app pipelinecomponents/eslint:latest lint"
 # Stylelint (via community image with Node 22 LTS)
 alias stylelint-docker="docker_alias /app solutiondrive/stylelint:latest lint"
 
+# Prettier (community image)
+alias prettier-docker="docker_alias /app tmknom/prettier:latest"
+
 # Runtime aliases
 #
 # Node.js (pinned to 22-alpine LTS)

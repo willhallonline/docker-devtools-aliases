@@ -36,30 +36,23 @@ function Invoke-DockerAlias {
         PowerShell equivalent of the docker_alias bash function. Mounts $PWD into
         the container at -WorkingDir, runs -Image (optionally with a command),
         and forwards any remaining arguments to the containerized process.
+        An optional "--entrypoint <name>" pair immediately after the image
+        overrides the container's baked-in entrypoint.
+
+        This is intentionally a "basic" (non-advanced) function — it has no
+        [Parameter()]/[CmdletBinding()] attributes — so that PowerShell does not
+        layer on the common parameters (-ErrorAction, -OutVariable, etc.). If it
+        were advanced, single-dash passthrough flags like "-o" (used by cwebp)
+        would be ambiguously prefix-matched against "-OutVariable"/"-OutBuffer"
+        and rejected instead of being forwarded to the containerized process.
     #>
-    param(
-        [string] $WorkingDir,
-        [string] $Image
-    )
+    param($WorkingDir, $Image)
+    $Rest = $args
 
     if (-not $WorkingDir -or -not $Image) {
         Write-Error 'docker-devtools: Invoke-DockerAlias requires a working directory and image.'
         return
     }
-
-    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-        Write-Error 'docker-devtools: docker is not installed or not in PATH.'
-        return
-    }
-
-    # Everything after -WorkingDir/-Image is forwarded verbatim to the
-    # container. Deliberately NOT using [Parameter(ValueFromRemainingArguments)]
-    # here (which would make this an "advanced" function): advanced functions
-    # try to bind short passthrough flags like -o or -d against PowerShell's
-    # common parameters (-OutVariable, -Debug, ...) and fail with an
-    # "ambiguous parameter" error. Keeping this a simple function and reading
-    # $args directly avoids that.
-    $Rest = [string[]]$args
 
     # Optional --entrypoint <name> immediately after the image, used to
     # override a container's baked-in entrypoint (e.g. selecting a specific
@@ -72,6 +65,11 @@ function Invoke-DockerAlias {
         }
         $entrypoint = $Rest[1]
         $Rest = if ($Rest.Count -gt 2) { $Rest[2..($Rest.Count - 1)] } else { @() }
+    }
+
+    if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+        Write-Error 'docker-devtools: docker is not installed or not in PATH.'
+        return
     }
 
     $ttyMode = if ($env:DOCKER_DEVTOOLS_TTY) { $env:DOCKER_DEVTOOLS_TTY } else { 'always' }

@@ -25,4 +25,5 @@ _phpcs_pair wordpress
 _phpcs_pair drupal    "--extensions=php,inc,install,module,theme"
 _phpcs_pair yii
 _phpcs_pair laravel
+_phpcs_pair symfony
 _phpcs_pair generic   # Generic PSR-12 / custom standards

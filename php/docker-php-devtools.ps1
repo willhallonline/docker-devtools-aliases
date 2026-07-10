@@ -1,7 +1,10 @@
 # Docker DevTools — PHP (PowerShell)
 
-# Composer
-function composer-docker { Invoke-DockerAlias /app willhallonline/composer:alpine composer @args }
+# PHP Package Management
+#
+# Composer (official image, PHP 8.4-alpine LTS)
+function composer-docker { Invoke-DockerAlias /app composer:latest composer @args }
+function php-docker { Invoke-DockerAlias /app php:8.4-alpine php @args }
 
 # PHP CodeSniffer — local binaries (Drupal Coder)
 # Requires a local Composer-installed copy of drupal/coder (~/.composer/vendor/drupal/coder).
@@ -18,27 +21,28 @@ function phpcbf-d {
     & $phpcbfBin "--standard=$standard" '--extensions=php,inc,install,module,theme' @args
 }
 
-# PHP CodeSniffer — Docker images
-# Registers a phpcs/phpcbf function pair: New-PhpcsPair <name> <image> [extra-args...]
+# Docker images (community-maintained texthtml/phpcs with PHP CodeSniffer 4.0.1)
+# Registers a phpcs/phpcbf function pair: New-PhpcsPair <name> [extra-args...]
 function New-PhpcsPair {
     param(
         [Parameter(Mandatory)] [string] $Name,
-        [Parameter(Mandatory)] [string] $Image,
         [Parameter()] [string[]] $ExtraArgs = @()
     )
 
     Set-Item -Path "function:global:phpcs-$Name" -Value {
-        Invoke-DockerAlias /app $Image phpcs @ExtraArgs @args
+        Invoke-DockerAlias /app texthtml/phpcs:latest phpcs @ExtraArgs @args
     }.GetNewClosure()
 
     Set-Item -Path "function:global:phpcbf-$Name" -Value {
-        Invoke-DockerAlias /app $Image phpcbf @ExtraArgs @args
+        Invoke-DockerAlias /app texthtml/phpcs:latest phpcbf @ExtraArgs @args
     }.GetNewClosure()
 }
 
-New-PhpcsPair -Name cakephp   -Image willhallonline/cakephp-phpcs:alpine
-New-PhpcsPair -Name wordpress -Image willhallonline/wordpress-phpcs:alpine
-New-PhpcsPair -Name drupal    -Image willhallonline/drupal-phpcs:alpine -ExtraArgs '--extensions=php,inc,install,module,theme'
-New-PhpcsPair -Name yii       -Image willhallonline/yii-phpcs:alpine
-New-PhpcsPair -Name laravel   -Image willhallonline/laravel-phpcs:alpine
-New-PhpcsPair -Name docker    -Image willhallonline/phpcs:alpine
+# Framework-specific PHPCS aliases (configure standards via .phpcs.xml in project root)
+New-PhpcsPair -Name cakephp
+New-PhpcsPair -Name wordpress
+New-PhpcsPair -Name drupal    -ExtraArgs '--extensions=php,inc,install,module,theme'
+New-PhpcsPair -Name yii
+New-PhpcsPair -Name laravel
+New-PhpcsPair -Name symfony
+New-PhpcsPair -Name generic   # Generic PSR-12 / custom standards

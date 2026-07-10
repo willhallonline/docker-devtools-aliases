@@ -1,17 +1,21 @@
-# Docker DevTools — JavaScript / CSS (PowerShell)
+# Docker DevTools — JavaScript & CSS (PowerShell)
 
-# Stylelint
-function stylelint-docker { Invoke-DockerAlias /app willhallonline/stylelint:alpine @args }
+# JavaScript & CSS Linting
+#
+# ESLint (via community image with Node 22 LTS)
+function eslint-docker { Invoke-DockerAlias /app pipelinecomponents/eslint:latest lint @args }
 
-# ESLint
-function eslint-standard { Invoke-DockerAlias /app willhallonline/eslint-standard:alpine @args }
-function eslint-airbnb { Invoke-DockerAlias /app willhallonline/eslint-airbnb:alpine @args }
+# Stylelint (via community image with Node 22 LTS)
+function stylelint-docker { Invoke-DockerAlias /app solutiondrive/stylelint:latest lint @args }
 
-# Node.js
-function node-docker { Invoke-DockerAlias /app node:alpine node @args }
-function npm-docker { Invoke-DockerAlias /app node:alpine npm @args }
-function yarn-docker { Invoke-DockerAlias /app node:alpine yarn @args }
-function node-bash-docker { Invoke-DockerAlias /app node /bin/bash @args }
+# Prettier (community image)
+function prettier-docker { Invoke-DockerAlias /app tmknom/prettier:latest @args }
 
-# CoffeeScript
-function coffee-docker { Invoke-DockerAlias /app shouldbee/coffeescript coffee @args }
+# Runtime aliases
+#
+# Node.js (pinned to 22-alpine LTS)
+function node-docker { Invoke-DockerAlias /app node:22-alpine node @args }
+function node-bash-docker { Invoke-DockerAlias /app node:22-alpine /bin/bash @args }
+function npm-docker { Invoke-DockerAlias /app node:22-alpine npm @args }
+function yarn-docker { Invoke-DockerAlias /app node:22-alpine yarn @args }
+function pnpm-docker { Invoke-DockerAlias /app node:22-alpine pnpm @args }
