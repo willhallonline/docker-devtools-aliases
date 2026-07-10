@@ -3,6 +3,9 @@
 # Stylelint
 function stylelint-docker { Invoke-DockerAlias /app willhallonline/stylelint:alpine @args }
 
+# Prettier
+function prettier-docker { Invoke-DockerAlias /app tmknom/prettier:latest @args }
+
 # ESLint
 function eslint-standard { Invoke-DockerAlias /app willhallonline/eslint-standard:alpine @args }
 function eslint-airbnb { Invoke-DockerAlias /app willhallonline/eslint-airbnb:alpine @args }
