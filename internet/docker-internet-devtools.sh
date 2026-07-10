@@ -41,3 +41,9 @@ alias k9s-docker="docker_alias /app derailed/k9s:latest"
 # kubeadm (kind's node image, which bundles kubeadm; no standalone official
 # kubeadm image exists) — usage: kubeadm-docker version
 alias kubeadm-docker="docker_alias /app kindest/node:latest --entrypoint kubeadm"
+
+# Helm (official image) — usage: helm-docker install my-release ./chart
+alias helm-docker="docker_alias /app alpine/helm:latest"
+
+# Packer (official image) — usage: packer-docker build template.pkr.hcl
+alias packer-docker="docker_alias /app hashicorp/packer:latest"

@@ -37,3 +37,9 @@ function k9s-docker { Invoke-DockerAlias /app derailed/k9s:latest @args }
 # kubeadm (kind's node image, which bundles kubeadm; no standalone official
 # kubeadm image exists) — usage: kubeadm-docker version
 function kubeadm-docker { Invoke-DockerAlias /app kindest/node:latest --entrypoint kubeadm @args }
+
+# Helm (official image) — usage: helm-docker install my-release ./chart
+function helm-docker { Invoke-DockerAlias /app alpine/helm:latest @args }
+
+# Packer (official image) — usage: packer-docker build template.pkr.hcl
+function packer-docker { Invoke-DockerAlias /app hashicorp/packer:latest @args }

@@ -57,3 +57,9 @@ alias rclone-docker="docker_alias /app rclone/rclone:latest"
 # There is no official pre-built image, so it's pip-installed at runtime.
 # usage: watchdog-docker shell-command --patterns="*.py" --command='pytest'
 alias watchdog-docker="docker_alias /app python:3.13-slim sh -c 'pip install --quiet --no-cache-dir watchdog 1>&2 && exec watchmedo \"\$@\"' --"
+
+# hadolint — Dockerfile linter (official image) — usage: hadolint-docker Dockerfile
+alias hadolint-docker="docker_alias /app hadolint/hadolint:latest hadolint"
+
+# markdownlint-cli — Markdown linter (community image) — usage: markdownlint-docker '**/*.md'
+alias markdownlint-docker="docker_alias /app igorshubovych/markdownlint-cli:latest"

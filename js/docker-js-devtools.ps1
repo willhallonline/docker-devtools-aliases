@@ -11,6 +11,12 @@ function stylelint-docker { Invoke-DockerAlias /app solutiondrive/stylelint:late
 # Prettier (community image)
 function prettier-docker { Invoke-DockerAlias /app tmknom/prettier:latest @args }
 
+# Biome — combined fast linter + formatter (official image)
+function biome-docker { Invoke-DockerAlias /app ghcr.io/biomejs/biome:latest @args }
+
+# tsc — TypeScript compiler / type-checker (no fixed official image, run via npx on Node 22)
+function tsc-docker { Invoke-DockerAlias /app node:22-alpine npx --yes typescript tsc @args }
+
 # Runtime aliases
 #
 # Node.js (pinned to 22-alpine LTS)

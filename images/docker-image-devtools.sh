@@ -21,3 +21,7 @@ alias vipsthumbnail-docker="docker_alias /images marcbachmann/libvips:latest --e
 # dwebp-docker — usage: dwebp-docker input.webp -o output.png
 alias cwebp-docker="docker_alias /images takecy/webp:latest --entrypoint cwebp"
 alias dwebp-docker="docker_alias /images takecy/webp:latest --entrypoint dwebp"
+
+# ExifTool — read/write image & file metadata (community image)
+# usage: exiftool-docker -all= image.jpg
+alias exiftool-docker="docker_alias /images kroniak/exiftool:latest"

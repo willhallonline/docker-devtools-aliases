@@ -96,3 +96,15 @@ function watchdog-docker {
     $a = @('/app', 'python:3.13-slim', 'sh', '-c', 'pip install --quiet --no-cache-dir watchdog 1>&2 && exec watchmedo "$@"', '--') + [string[]]$args
     Invoke-DockerAlias @a
 }
+
+# hadolint — Dockerfile linter (official image) — usage: hadolint-docker Dockerfile
+function hadolint-docker {
+    $a = @('/app', 'hadolint/hadolint:latest', 'hadolint') + [string[]]$args
+    Invoke-DockerAlias @a
+}
+
+# markdownlint-cli — Markdown linter (community image) — usage: markdownlint-docker '**/*.md'
+function markdownlint-docker {
+    $a = @('/app', 'igorshubovych/markdownlint-cli:latest') + [string[]]$args
+    Invoke-DockerAlias @a
+}
