@@ -65,8 +65,13 @@ try {
     Write-Host ''
     Write-Host 'Invoke-DockerAlias: argument validation'
 
-    $errOutput = $(Invoke-DockerAlias -WorkingDir '' -Image '' -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1)
-    assert-contains 'too-few-args: stderr message' 'requires a working directory' ($errVar -join ' ')
+    try {
+        Invoke-DockerAlias -WorkingDir '' -Image ''
+        $errVar = ''
+    } catch {
+        $errVar = $_.Exception.Message
+    }
+    assert-contains 'too-few-args: stderr message' 'requires a working directory' $errVar
 
     Write-Host ''
     Write-Host 'Invoke-DockerAlias: basic argv construction'
@@ -150,14 +155,54 @@ try {
     Write-Host ''
     Write-Host 'Invoke-DockerAlias: invalid runtime config'
     $env:DOCKER_DEVTOOLS_TTY = 'invalid'
-    $errOutput = Invoke-DockerAlias /app myimage:tag -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1
+    try {
+        Invoke-DockerAlias /app myimage:tag
+        $errVar = ''
+    } catch {
+        $errVar = $_.Exception.Message
+    }
     Remove-Item Env:\DOCKER_DEVTOOLS_TTY
-    assert-contains 'invalid-tty: stderr message' 'invalid DOCKER_DEVTOOLS_TTY value' ($errVar -join ' ')
+    assert-contains 'invalid-tty: stderr message' 'invalid DOCKER_DEVTOOLS_TTY value' $errVar
 
     $env:DOCKER_DEVTOOLS_MAP_HOST_USER = 'maybe'
-    $errOutput = Invoke-DockerAlias /app myimage:tag -ErrorVariable errVar -ErrorAction SilentlyContinue 2>&1
+    try {
+        Invoke-DockerAlias /app myimage:tag
+        $errVar = ''
+    } catch {
+        $errVar = $_.Exception.Message
+    }
     Remove-Item Env:\DOCKER_DEVTOOLS_MAP_HOST_USER
-    assert-contains 'invalid-bool: stderr message' 'invalid DOCKER_DEVTOOLS_MAP_HOST_USER value' ($errVar -join ' ')
+    assert-contains 'invalid-bool: stderr message' 'invalid DOCKER_DEVTOOLS_MAP_HOST_USER value' $errVar
+
+    Write-Host ''
+    Write-Host 'Invoke-DockerAlias: --entrypoint override'
+    Push-Location $TmpDir
+    Invoke-DockerAlias /app myimage:tag --entrypoint mogrify input.jpg -resize 50%
+    Pop-Location
+    $argv = _read-stub
+    assert-contains 'entrypoint: flag present' '--entrypoint' ($argv -join ' ')
+    assert-contains 'entrypoint: value present' 'mogrify' ($argv -join ' ')
+    assert-contains 'entrypoint: passthrough args preserved' 'input.jpg' ($argv -join ' ')
+    assert-contains 'entrypoint: passthrough flag preserved' '-resize' ($argv -join ' ')
+
+    Write-Host ''
+    Write-Host 'Invoke-DockerAlias: --entrypoint missing value'
+    try {
+        Invoke-DockerAlias /app myimage:tag --entrypoint
+        $errVar = ''
+    } catch {
+        $errVar = $_.Exception.Message
+    }
+    assert-contains 'entrypoint-missing: stderr message' '--entrypoint requires a value' $errVar
+
+    Write-Host ''
+    Write-Host 'Invoke-DockerAlias: single-dash passthrough flags (e.g. cwebp -o)'
+    Push-Location $TmpDir
+    Invoke-DockerAlias /images myimage:tag -o output.webp
+    Pop-Location
+    $argv = _read-stub
+    assert-contains 'passthrough-dash: -o flag preserved' '-o' ($argv -join ' ')
+    assert-contains 'passthrough-dash: value preserved' 'output.webp' ($argv -join ' ')
 }
 finally {
     Remove-Item -Recurse -Force $TmpDir -ErrorAction SilentlyContinue
