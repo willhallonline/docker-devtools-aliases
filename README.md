@@ -7,7 +7,7 @@ Docker DevTools provides a set of shell aliases that run common developer tools 
 | Requirement | Notes |
 |-------------|-------|
 | **Docker** | Must be installed and in `PATH`. [Get Docker](https://docs.docker.com/get-docker/) |
-| **Bash 4+** or **zsh** | The wrapper uses bash arrays; macOS ships bash 3 — upgrade via Homebrew (`brew install bash`) or use zsh |
+| **Bash 4+** | The wrapper uses Bash-specific arrays and parameter expansions; macOS ships bash 3 — upgrade via Homebrew (`brew install bash`) |
 | **PowerShell 5.1+** or **PowerShell 7+** | Only needed if you use the `.ps1` scripts instead of the bash version (Windows, or cross-platform `pwsh`) |
 | **git** | Recommended for installation and updates |
 
@@ -21,9 +21,9 @@ git clone https://github.com/willhallonline/docker-devtools-aliases.git ~/.docke
 
 Cloning lets you pull future updates with a simple `git pull`.
 
-### Bash / zsh
+### Bash
 
-Add the following line to your `~/.bashrc` or `~/.zshrc`:
+Add the following line to your `~/.bashrc`:
 
 ```bash
 source ~/.docker-devtools/docker-devtools.sh
@@ -32,7 +32,7 @@ source ~/.docker-devtools/docker-devtools.sh
 Then reload your shell:
 
 ```bash
-source ~/.bashrc   # or: source ~/.zshrc
+source ~/.bashrc
 ```
 
 ### PowerShell
