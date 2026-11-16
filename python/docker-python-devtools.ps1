@@ -19,3 +19,9 @@ function mypy-docker { Invoke-DockerAlias /app cytopia/mypy:latest mypy @args }
 
 # Bandit — security linter
 function bandit-docker { Invoke-DockerAlias /app cytopia/bandit:latest bandit @args }
+
+# Ruff — fast linter/formatter (official image)
+function ruff-docker { Invoke-DockerAlias /app ghcr.io/astral-sh/ruff:latest @args }
+
+# Poetry — dependency & package manager (community image)
+function poetry-docker { Invoke-DockerAlias /app cytopia/poetry:latest poetry @args }

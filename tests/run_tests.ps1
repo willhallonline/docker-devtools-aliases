@@ -117,6 +117,25 @@ try {
     $cmd = Get-Command Invoke-DockerAlias -ErrorAction SilentlyContinue
     assert-eq 'alias-load: Invoke-DockerAlias still defined after source' $true ($null -ne $cmd)
 
+    . (Join-Path $RepoRoot 'python/docker-python-devtools.ps1')
+
+    Write-Host ''
+    Write-Host 'Python aliases: Ruff and Poetry'
+    Push-Location $TmpDir
+    ruff-docker check .
+    Pop-Location
+    $argv = _read-stub
+    assert-contains 'ruff: image present' 'ghcr.io/astral-sh/ruff:latest' ($argv -join ' ')
+    assert-eq 'ruff: argument forwarded' '.' $argv[-1]
+
+    Push-Location $TmpDir
+    poetry-docker install
+    Pop-Location
+    $argv = _read-stub
+    assert-contains 'poetry: image present' 'cytopia/poetry:latest' ($argv -join ' ')
+    assert-contains 'poetry: command present' 'poetry' ($argv -join ' ')
+    assert-eq 'poetry: argument forwarded' 'install' $argv[-1]
+
     Write-Host ''
     Write-Host 'Invoke-DockerAlias: DOCKER_DEVTOOLS_EXTRA_ARGS'
     $env:DOCKER_DEVTOOLS_EXTRA_ARGS = '--network host --pull always'
